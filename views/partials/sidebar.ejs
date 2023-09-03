@@ -1,0 +1,46 @@
+<div class="sidebar">
+    <h2>Sidebar</h2>
+    <ul>
+        <li>Item 1</li>
+        <li>Item 2</li>
+        <li>Item 3</li>
+    </ul>
+</div>
+
+
+
+<style>
+    /* Apply styles to the entire page */
+    html,
+    body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Create a flex container for the entire page */
+    body {
+        display: flex;
+        flex-direction: row;
+        /* Make it horizontal */
+    }
+
+    /* Create a sidebar */
+    .sidebar {
+        background-color: black;
+        /* Background color for the sidebar */
+        color: #fff;
+        /* Text color for the sidebar */
+        border-right: 2px solid lightgray;
+        width: 250px;
+        /* Width of the sidebar */
+        padding: 20px;
+    }
+
+    /* Create a main content area */
+    .content {
+        flex: 1;
+        /* Allow it to grow and take up the remaining space */
+        padding: 20px;
+    }
+</style>
