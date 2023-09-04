@@ -1,1 +1,26 @@
-<% layout('./layouts/boilerplate')%>
+<% layout('layouts/boilerplate')%>
+
+    <div class="main-content">
+        <% for (let post of posts){%>
+            <img src="<%= post.image%>" alt="">
+            <p><%= post.description %></p>
+            <p><%=post.likes%></p>
+            <% }%>
+    </div>
+
+    <style>
+        .main-content {
+            position: fixed;
+            right: 0;
+            width: 85%;
+            height: 100%;
+            background-color: black;
+            overflow: auto;
+            padding: 40px;
+            color: white; /* Added text color for the form */
+        }
+    
+        p {
+            color: white;
+        }
+    </style>

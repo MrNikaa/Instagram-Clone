@@ -23,7 +23,8 @@ app.engine('ejs', ejsMate)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
 
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.urlencoded({extended: true}));
 
 
 app.listen(3000, () => {
@@ -31,6 +32,16 @@ app.listen(3000, () => {
 });
 
 app.get('/', async (req, res) => {
-    
-      res.render('home');
+  const posts = await Post.find({});
+    res.render('home', { posts });
+});
+
+app.get('/createPost', (req, res) => {
+     res.render('create');
+});
+
+app.post('/', async (req, res) => {
+  const post = new Post(req.body.post);
+  await post.save();
+  res.redirect('/');
 });
