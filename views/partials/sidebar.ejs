@@ -4,13 +4,28 @@
     <nav class="nav-area">
         <h1>Instagram</h1>
 
-        <button class="btn-container">
+        <button class="btn-container" id="home-button">
             <img src="/imgs/home.png" alt="Home Button">
             <p class="btn-description">Home</p>
         </button>
-        <button class="btn-container">
-            <img src="/imgs/create.png" alt="Home Button">
+        <button class="btn-container" id="create-button">
+            <img src="/imgs/create.png" alt="Create Button">
             <p class="btn-description">Create</p>
         </button>
     </nav>
 </div>
+
+<script>
+    // Get references to the buttons
+    const homeButton = document.getElementById("home-button");
+    const createButton = document.getElementById("create-button");
+
+    // Define onclick event handlers for the buttons
+    homeButton.onclick = function() {
+        window.location.href = "/";
+    };
+
+    createButton.onclick = function() {
+        window.location.href = "/createPost";
+    };
+</script>
