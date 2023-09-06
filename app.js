@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const Post = require('./models/post');
+const methodOverride = require("method-override");
 
 mongoose.connect('mongodb://0.0.0.0:27017/instagram-clone', {
 
@@ -25,6 +26,8 @@ app.set('views', path.join(__dirname, 'views'))
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({extended: true}));
+app.use(methodOverride("_method"));
+
 
 
 app.listen(3000, () => {
@@ -45,3 +48,10 @@ app.post('/', async (req, res) => {
   await post.save();
   res.redirect('/');
 });
+
+app.delete('/:id'), async (req, res) => {
+  const { id } = req.params;
+  console.log(id);
+  await Post.findByIdAndDelete(id);
+  res.redirect('/');
+}

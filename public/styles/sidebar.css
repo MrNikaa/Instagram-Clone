@@ -27,6 +27,12 @@
         flex-direction: row;
         align-items: center;
         margin-bottom: 30px;
+        background: transparent;
+        padding: 10px;
+        width: 80%;
+        border:0px;
+        border-radius: 15px;
+        transition: background-color 0.3s ease;
     }
 
     .btn-description {
@@ -37,16 +43,7 @@
         font-size: 20px;
     }
 
-    button {
-        background: transparent;
-        padding: 10px;
-        width: 80%;
-        border:0px;
-        border-radius: 15px;
-        transition: background-color 0.3s ease;
-    }
-
-    button:hover{
+    .btn-container:hover{
         background-color: #1F1E1E;
     }
 
