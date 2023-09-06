@@ -49,9 +49,8 @@ app.post('/', async (req, res) => {
   res.redirect('/');
 });
 
-app.delete('/:id'), async (req, res) => {
+app.delete('/:id', async (req, res) => {
   const { id } = req.params;
-  console.log(id);
   await Post.findByIdAndDelete(id);
   res.redirect('/');
-}
+});
