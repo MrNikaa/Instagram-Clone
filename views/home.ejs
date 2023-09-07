@@ -19,13 +19,12 @@
                     <%= post.description %>
                 </p>
             </div>
-             <div id="more-container">
+            <div id="more-container">
                     <form class="d-inline" action="/<%=post._id%>?_method=DELETE" method="POST">
                         <button class="more-buttons">Delete</button>
                     </form>
                 </div>
             <% } %>
-
     </div>
 
     <style>
@@ -126,7 +125,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             // Get references to the button, the image, and the container
-            const moreButton = document.querySelector(".more-button img"); // Target the image inside the button
+            const moreButtons = document.querySelectorAll(".more-button img"); // Target the image inside the button
             const moreContainer = document.getElementById("more-container");
             const mainContent = document.querySelector(".main-content");
 
@@ -146,7 +145,9 @@
             }
 
             // Add a click event listener to the more button image
-            moreButton.addEventListener("click", toggleMoreContainer);
+            for (let moreButton of moreButtons) {
+                moreButton.addEventListener("click", toggleMoreContainer);
+            }
 
             // Add a click event listener to the document to close the container when clicking outside of it
             document.addEventListener("click", function (event) {
