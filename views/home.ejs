@@ -3,8 +3,8 @@
     <div class="main-content">
         <% for (let post of posts) { %>
             <div class="post-container">
-                <button class="more-button">
-                    <img src="/imgs/more.png" alt="comment icon">
+                <button class="more-button"">
+                    <img src="/imgs/more.png" alt="comment icon" data-post-id="<%= post._id %>">
                 </button>
                 <img class="post-img" src="<%= post.image %>" alt="">
                 <div class="icon-container">
@@ -12,19 +12,17 @@
                     <img class="icon-img" src="/imgs/comment.png" alt="comment icon">
                     <img class="icon-img" src="/imgs/forward.png" alt="forward icon">
                 </div>
-                <p class="post-info-text">
-                    <%= post.likes %> Likes
-                </p>
-                <p class="post-info-text">
-                    <%= post.description %>
-                </p>
+                <p class="post-info-text"><%= post.likes %> Likes </p>
+                <p class="post-info-text"><%= post.description %></p>
             </div>
-            <div id="more-container">
-                    <form class="d-inline" action="/<%=post._id%>?_method=DELETE" method="POST">
-                        <button class="more-buttons">Delete</button>
-                    </form>
-                </div>
             <% } %>
+            <div id="more-container">
+                <form id="myForm" method="POST">
+                    <button class="more-buttons">Delete</button>
+                </form>
+            </div>
+
+
     </div>
 
     <style>
@@ -124,36 +122,30 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Get references to the button, the image, and the container
-            const moreButtons = document.querySelectorAll(".more-button img"); // Target the image inside the button
+            const moreButtons = document.querySelectorAll(".more-button img"); 
             const moreContainer = document.getElementById("more-container");
             const mainContent = document.querySelector(".main-content");
+            let postID;
+            const form = document.getElementById("myForm");
 
-            function disableScrolling() {
-                moreContainer.style.display = "none";
-                mainContent.style.overflow = "auto"; // Re-enable scrolling in main content
-            }
+            function toggleMoreContainer(event) {
+                const clickedButton = event.currentTarget;
+                postID = clickedButton.dataset.postId; // Retrieve the post ID
+                form.action = `/${postID}/?_method=DELETE`;
 
-            // Function to toggle the visibility of the more container and disable scrolling in the main content
-            function toggleMoreContainer() {
                 if (moreContainer.style.display === "none") {
+                    //enable scroll
                     moreContainer.style.display = "block";
-                    mainContent.style.overflow = "hidden"; // Disable scrolling in main content
+                    mainContent.style.overflow = "hidden";
                 } else {
-                    disableScrolling();
+                    //disable scroll
+                    moreContainer.style.display = "none";
+                     mainContent.style.overflow = "auto"; 
                 }
             }
 
-            // Add a click event listener to the more button image
             for (let moreButton of moreButtons) {
                 moreButton.addEventListener("click", toggleMoreContainer);
             }
-
-            // Add a click event listener to the document to close the container when clicking outside of it
-            document.addEventListener("click", function (event) {
-                if (!moreContainer.contains(event.target) && event.target !== moreButton) {
-                    disableScrolling();
-                }
-            });
         });
     </script>
