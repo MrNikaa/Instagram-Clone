@@ -4,7 +4,7 @@
         <% for (let post of posts) { %>
             <div class="post-container">
                 <button class="more-button"">
-                    <img src="/imgs/more.png" alt="comment icon" data-post-id="<%= post._id %>">
+                    <img src=" /imgs/more.png" alt="comment icon" data-post-id="<%= post._id %>">
                 </button>
                 <img class="post-img" src="<%= post.image %>" alt="">
                 <div class="icon-container">
@@ -12,15 +12,22 @@
                     <img class="icon-img" src="/imgs/comment.png" alt="comment icon">
                     <img class="icon-img" src="/imgs/forward.png" alt="forward icon">
                 </div>
-                <p class="post-info-text"><%= post.likes %> Likes </p>
-                <p class="post-info-text"><%= post.description %></p>
+                <p class="post-info-text">
+                    <%= post.likes %> Likes
+                </p>
+                <p class="post-info-text">
+                    <%= post.description %>
+                </p>
+                <%=post._id%>
             </div>
             <% } %>
-            <div id="more-container">
-                <form id="myForm" method="POST">
-                    <button class="more-buttons">Delete</button>
-                </form>
-            </div>
+
+                <div id="more-container">
+                    <form id="myForm" method="POST">
+                        <button class="more-buttons">Delete</button>
+                    </form>
+                    <button class="more-buttons" id="edit-button">Edit</button>
+                </div>
 
 
     </div>
@@ -102,6 +109,7 @@
             background: transparent;
             border: 0px;
             color: red;
+            padding: 20px;
             border-bottom: 1px solid gray;
         }
 
@@ -122,7 +130,8 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const moreButtons = document.querySelectorAll(".more-button img"); 
+            const moreButtons = document.querySelectorAll(".more-button img");
+            const editButton = document.getElementById("edit-button");
             const moreContainer = document.getElementById("more-container");
             const mainContent = document.querySelector(".main-content");
             let postID;
@@ -130,7 +139,7 @@
 
             function toggleMoreContainer(event) {
                 const clickedButton = event.currentTarget;
-                postID = clickedButton.dataset.postId; // Retrieve the post ID
+                postID = clickedButton.dataset.postId;
                 form.action = `/${postID}/?_method=DELETE`;
 
                 if (moreContainer.style.display === "none") {
@@ -140,9 +149,14 @@
                 } else {
                     //disable scroll
                     moreContainer.style.display = "none";
-                     mainContent.style.overflow = "auto"; 
+                    mainContent.style.overflow = "auto";
                 }
             }
+
+            editButton.addEventListener("click", function () {
+                // Redirect to /id/edit
+                window.location.href = `/${postID}/edit`;
+            });
 
             for (let moreButton of moreButtons) {
                 moreButton.addEventListener("click", toggleMoreContainer);

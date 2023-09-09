@@ -39,6 +39,18 @@ app.get('/', async (req, res) => {
     res.render('home', { posts });
 });
 
+app.get('/post/:id', async (req,res) => {
+  const post = await Post.findById(req.params.id);
+  res.render('show', { post });
+});
+
+app.put('/post/:id', async (req, res) =>{
+  const {id} = req.params;
+    const post = await Post.findByIdAndUpdate(id, { ...req.body.post });
+    await post.save();
+    res.redirect(`/post/${post._id}`)
+});
+
 app.get('/createPost', (req, res) => {
      res.render('create');
 });
@@ -53,4 +65,10 @@ app.delete('/:id', async (req, res) => {
   const { id } = req.params;
   await Post.findByIdAndDelete(id);
   res.redirect('/');
+});
+
+app.get('/:id/edit', async (req, res) =>{
+  const { id } = req.params;
+  const post = await Post.findById(id);
+  res.render('edit', {post});
 });

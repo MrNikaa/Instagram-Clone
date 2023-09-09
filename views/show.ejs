@@ -1,0 +1,163 @@
+<% layout('layouts/boilerplate') %>
+<div class="main-content">
+        <div class="post-container">
+            <button class="more-button">
+                <img src="/imgs/more.png" alt="comment icon">
+            </button>
+            <img class="post-img" src="<%= post.image %>" alt="">
+            <div class="icon-container">
+                <img class="icon-img" src="/imgs/like-unchecked.png" alt="like icon">
+                <img class="icon-img" src="/imgs/comment.png" alt="comment icon">
+                <img class="icon-img" src="/imgs/forward.png" alt="forward icon">
+            </div>
+            <p class="post-info-text">
+                <%= post.likes %> Likes
+            </p>
+            <p class="post-info-text">
+                <%= post.description %>
+            </p>
+        </div>
+         <div id="more-container">
+                <form class="d-inline" action="/<%=post._id%>?_method=DELETE" method="POST">
+                    <button class="more-buttons">Delete</button>
+                </form>
+                <button class="more-buttons" id="edit-button">Edit</button>
+        </div>
+</div>
+
+    <style>
+        .post-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 25vw;
+            margin: 0 auto;
+        }
+
+        .post-img {
+            width: 100%;
+            height: 40%;
+            border: 2px solid #1F1E1E;
+            border-radius: 10px;
+        }
+
+        .icon-container {
+            display: flex;
+            justify-content: flex-start;
+            width: 100%;
+            padding: 10px 0px 10px 0px;
+        }
+
+        .icon-img {
+            width: 26px;
+            height: 26px;
+            margin-right: 12px;
+        }
+
+        .main-content {
+            position: fixed;
+            right: 0;
+            width: 85%;
+            height: 100%;
+            background-color: black;
+            overflow: auto;
+            padding: 40px;
+            color: white;
+            /* Added text color for the form */
+        }
+
+        .more-button {
+            align-self: flex-end;
+            border: 0px;
+            background: transparent;
+        }
+
+        .more-button:hover {
+            cursor: pointer;
+        }
+
+        .more-button img:active {
+            filter: brightness(0.35);
+        }
+
+        #more-container {
+            position: fixed;
+            width: 450px;
+            height: 500px;
+            top: 50%;
+            left: 50%;
+            margin-top: -250px;
+            /* Negative half of height. */
+            margin-left: -225px;
+            /* Negative half of width. */
+            background-color: #1F1E1E;
+            display: none;
+            /* Initially hide the more container */
+            border-radius: 25px;
+        }
+
+        .more-buttons {
+            width: 100%;
+            height: 10%;
+            background: transparent;
+            border: 0px;
+            color: red;
+            padding: 20px;
+            border-bottom: 1px solid gray;
+        }
+
+        .post-info-text {
+            font-family: sans-serif;
+            color: white;
+            align-self: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .post-info-text:nth-of-type(2) {
+            font-size: 14px;
+            padding-bottom: 15px;
+            width: 100%;
+            border-bottom: 2px solid #1F1E1E;
+        }
+    </style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Get references to the button, the image, and the container
+        const moreButton = document.querySelector(".more-button img"); // Target the image inside the button
+        const editButton = document.getElementById("edit-button");
+        const moreContainer = document.getElementById("more-container");
+        const mainContent = document.querySelector(".main-content");
+
+        function disableScrolling() {
+            moreContainer.style.display = "none";
+            mainContent.style.overflow = "auto"; // Re-enable scrolling in main content
+        }
+
+        // Function to toggle the visibility of the more container and disable scrolling in the main content
+        function toggleMoreContainer() {
+            if (moreContainer.style.display === "none") {
+                moreContainer.style.display = "block";
+                mainContent.style.overflow = "hidden"; // Disable scrolling in main content
+            } else {
+                disableScrolling();
+            }
+        }
+
+        // Add a click event listener to the more button image
+        moreButton.addEventListener("click", toggleMoreContainer);
+
+        editButton.addEventListener("click", function () {
+                // Redirect to /id/edit
+                
+                window.location.href = `/<%=post._id%>/edit`;
+            });
+
+        // Add a click event listener to the document to close the container when clicking outside of it
+        document.addEventListener("click", function (event) {
+            if (!moreContainer.contains(event.target) && event.target !== moreButton) {
+                disableScrolling();
+            }
+        });
+    });
+</script>
