@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
+const catchAsync = require('./utils/catchAsync');
+const ExpressError = require('./utils/ExpressError')
 const Post = require('./models/post');
 const methodOverride = require("method-override");
 
@@ -29,46 +31,54 @@ app.use(express.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
 
 
-
-app.listen(3000, () => {
-    console.log("serving on port 3000");
-});
-
 app.get('/', async (req, res) => {
   const posts = await Post.find({});
     res.render('home', { posts });
 });
 
-app.get('/post/:id', async (req,res) => {
+app.get('/post/:id', catchAsync(async (req,res) => {
   const post = await Post.findById(req.params.id);
   res.render('show', { post });
-});
+}));
 
-app.put('/post/:id', async (req, res) =>{
+app.put('/post/:id',  catchAsync(async (req, res) =>{
   const {id} = req.params;
     const post = await Post.findByIdAndUpdate(id, { ...req.body.post });
     await post.save();
     res.redirect(`/post/${post._id}`)
-});
+}));
 
 app.get('/createPost', (req, res) => {
      res.render('create');
 });
 
-app.post('/', async (req, res) => {
+app.post('/', catchAsync(async (req, res) => {
   const post = new Post(req.body.post);
   await post.save();
-  res.redirect('/');
-});
+  res.redirect(`/post/${post._id}`);
+}));
 
-app.delete('/:id', async (req, res) => {
+app.delete('/:id',  catchAsync(async (req, res) => {
   const { id } = req.params;
   await Post.findByIdAndDelete(id);
   res.redirect('/');
-});
+}));
 
-app.get('/:id/edit', async (req, res) =>{
+app.get('/:id/edit', catchAsync( async (req, res) =>{
   const { id } = req.params;
   const post = await Post.findById(id);
   res.render('edit', {post});
+}));
+
+app.all('*', (req,res,next) =>{
+  next(new ExpressError('Page not found!', 404));
+});
+
+app.use((err, req, res, next) =>{
+  const {statusCode = 500, message = "Something went wrong"} = err;
+  res.status(statusCode).send(message);
+});
+
+app.listen(3000, () => {
+  console.log("serving on port 3000");
 });
