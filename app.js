@@ -3,6 +3,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const catchAsync = require('./utils/catchAsync');
 const ExpressError = require('./utils/ExpressError')
+const {postSchema} = require('./schemas.js');
 const Post = require('./models/post');
 const methodOverride = require("method-override");
 
@@ -30,6 +31,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
 
+const validatePost = (req, res, next) => {
+  const result = postSchema.validate(req.body)
+  if(result.error){
+    const msg = error.details.map(el => el.message).join(',');
+    throw new ExpressError(msg, 400);
+  }else
+  {
+    next();
+  }
+}
+
 
 app.get('/', async (req, res) => {
   const posts = await Post.find({});
@@ -41,7 +53,7 @@ app.get('/post/:id', catchAsync(async (req,res) => {
   res.render('show', { post });
 }));
 
-app.put('/post/:id',  catchAsync(async (req, res) =>{
+app.put('/post/:id', validatePost, catchAsync(async (req, res) =>{
   const {id} = req.params;
     const post = await Post.findByIdAndUpdate(id, { ...req.body.post });
     await post.save();
@@ -52,7 +64,7 @@ app.get('/createPost', (req, res) => {
      res.render('create');
 });
 
-app.post('/', catchAsync(async (req, res) => {
+app.post('/',validatePost, catchAsync(async (req, res) => {
   const post = new Post(req.body.post);
   await post.save();
   res.redirect(`/post/${post._id}`);
@@ -76,7 +88,7 @@ app.all('*', (req,res,next) =>{
 
 app.use((err, req, res, next) =>{
   const {statusCode = 500, message = "Something went wrong"} = err;
-  res.status(statusCode).send(message);
+  res.status(statusCode).render('error');
 });
 
 app.listen(3000, () => {

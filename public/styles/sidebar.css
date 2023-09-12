@@ -52,7 +52,7 @@
         height: 32px;
     }
 
-    h1 {
+    .title-logo {
         color: white;
         font-family: 'Liu Jian Mao Cao', cursive;
         padding-left: 10px;
