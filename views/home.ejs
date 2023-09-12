@@ -24,9 +24,10 @@
 
                 <div id="more-container">
                     <form id="myForm" method="POST">
-                        <button class="more-buttons">Delete</button>
+                        <button class="more-buttons" id="delete-button">Delete</button>
                     </form>
                     <button class="more-buttons" id="edit-button">Edit</button>
+                    <button class="more-buttons" id="go-button">Go To Post</button>
                 </div>
 
 
@@ -102,12 +103,16 @@
             border-radius: 25px;
         }
 
+        #delete-button{
+            color:red;
+        }
+
         .more-buttons {
             width: 100%;
             height: 10%;
             background: transparent;
             border: 0px;
-            color: red;
+            color: white;
             padding: 20px;
             border-bottom: 1px solid gray;
         }
@@ -131,6 +136,7 @@
         document.addEventListener("DOMContentLoaded", function () {
             const moreButtons = document.querySelectorAll(".more-button img");
             const editButton = document.getElementById("edit-button");
+            const goButton = document.getElementById("go-button");
             const moreContainer = document.getElementById("more-container");
             const mainContent = document.querySelector(".main-content");
             let postID;
@@ -153,8 +159,11 @@
             }
 
             editButton.addEventListener("click", function () {
-                // Redirect to /id/edit
                 window.location.href = `/${postID}/edit`;
+            });
+
+            goButton.addEventListener("click", function () {
+                window.location.href = `/post/${postID}`;
             });
 
             for (let moreButton of moreButtons) {
