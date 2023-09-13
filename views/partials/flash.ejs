@@ -1,0 +1,84 @@
+<% if (success && success.length) { %>
+    <div class="alert" id="flash-alert">
+        <div class="alert-content">
+            <span class="icon">&#x2714;</span> <!-- Checkmark icon -->
+            <p class="message">
+                <%= success %>
+            </p>
+        </div>
+    </div>
+    <% } %>
+
+<% if (error && error.length) { %>
+    <div class="alert" id="flash-alert">
+        <div class="alert-content">
+            <span class="icon-fail">&#x2716;</span> <!-- Checkmark icon -->
+              <p class="message-fail">
+                <%= error %>
+            </p>
+        </div>
+    </div>
+<% } %>
+
+        <style>
+            .alert {
+                background-color: #1F1E1E;
+                width: 300px;
+                border-radius: 10px;
+                box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+                position: absolute;
+                bottom: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                animation: fadeOut 3s ease-in-out;
+            }
+
+            .alert-content {
+                padding: 20px;
+                text-align: center;
+            }
+
+            .icon {
+                font-size: 36px;
+                color: #33cc33;
+                display: block;
+            }
+
+            .icon-fail{
+                font-size: 36px;
+                color: red;
+                display: block;
+            }
+
+            .message {
+                font-size: 18px;
+                margin-top: 10px;
+                color: white;
+            }
+
+            .message-fail{
+                font-size: 18px;
+                margin-top: 10px;
+                color: red;
+            }
+
+            @keyframes fadeOut {
+                0% {
+                    opacity: 1;
+                }
+
+                100% {
+                    opacity: 0;
+                }
+            }
+        </style>
+
+<script>
+    // JavaScript to remove the alert element when animation is complete
+    const alertElement = document.getElementById('flash-alert');
+    if (alertElement) {
+        alertElement.addEventListener('animationend', () => {
+            alertElement.remove();
+        });
+    }
+</script>

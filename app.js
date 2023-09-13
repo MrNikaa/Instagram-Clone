@@ -1,11 +1,12 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
-const catchAsync = require('./utils/catchAsync');
+const session = require('express-session');
+const flash = require('connect-flash');
 const ExpressError = require('./utils/ExpressError')
-const {postSchema} = require('./schemas.js');
-const Post = require('./models/post');
 const methodOverride = require("method-override");
+
+const posts = require('./routes/posts');
 
 mongoose.connect('mongodb://0.0.0.0:27017/instagram-clone', {
 
@@ -31,56 +32,27 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
 
-const validatePost = (req, res, next) => {
-  const result = postSchema.validate(req.body)
-  if(result.error){
-    const msg = error.details.map(el => el.message).join(',');
-    throw new ExpressError(msg, 400);
-  }else
-  {
-    next();
+const sessionConfig = {
+  secret: 'secret',
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    httpOnly: true,
+    expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+    maxAge: 1000 * 60 * 60 * 24 * 7
   }
 }
+app.use(session(sessionConfig));
+app.use(flash());
 
-
-app.get('/', async (req, res) => {
-  const posts = await Post.find({});
-    res.render('home', { posts });
+app.use((req, res, next) => {
+  res.locals.success = req.flash('success');
+  res.locals.error = req.flash('error');
+  next();
 });
 
-app.get('/post/:id', catchAsync(async (req,res) => {
-  const post = await Post.findById(req.params.id);
-  res.render('show', { post });
-}));
+app.use('', posts); //use post route
 
-app.put('/post/:id', validatePost, catchAsync(async (req, res) =>{
-  const {id} = req.params;
-    const post = await Post.findByIdAndUpdate(id, { ...req.body.post });
-    await post.save();
-    res.redirect(`/post/${post._id}`)
-}));
-
-app.get('/createPost', (req, res) => {
-     res.render('create');
-});
-
-app.post('/',validatePost, catchAsync(async (req, res) => {
-  const post = new Post(req.body.post);
-  await post.save();
-  res.redirect(`/post/${post._id}`);
-}));
-
-app.delete('/:id',  catchAsync(async (req, res) => {
-  const { id } = req.params;
-  await Post.findByIdAndDelete(id);
-  res.redirect('/');
-}));
-
-app.get('/:id/edit', catchAsync( async (req, res) =>{
-  const { id } = req.params;
-  const post = await Post.findById(id);
-  res.render('edit', {post});
-}));
 
 app.all('*', (req,res,next) =>{
   next(new ExpressError('Page not found!', 404));
