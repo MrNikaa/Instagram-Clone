@@ -5,8 +5,12 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const ExpressError = require('./utils/ExpressError')
 const methodOverride = require("method-override");
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const User = require('./models/user');
 
-const posts = require('./routes/posts');
+const userRoutes = require('./routes/users');
+const postRoutes = require('./routes/posts');
 
 mongoose.connect('mongodb://0.0.0.0:27017/instagram-clone', {
 
@@ -44,6 +48,11 @@ const sessionConfig = {
 }
 app.use(session(sessionConfig));
 app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
   res.locals.success = req.flash('success');
@@ -51,7 +60,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('', posts); //use post route
+app.use('', userRoutes); //use user route 
+app.use('', postRoutes); //use post route
 
 
 app.all('*', (req,res,next) =>{
