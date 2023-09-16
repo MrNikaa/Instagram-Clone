@@ -1,9 +1,18 @@
 <% layout('layouts/boilerplate') %>
-<div class="main-content">
+    <div class="main-content">
         <div class="post-container">
-            <button class="more-button">
-                <img src="/imgs/more.png" alt="comment icon">
-            </button>
+            <div class="top-container">
+                <div class="author-container">
+                    <img src="/imgs/pfp.png" class="profile-picture" alt="">
+                    <p>
+                        <%= post.author.username %>
+                    </p>
+                </div>
+                <button class="more-button">
+                    <img src="/imgs/more.png" alt="comment icon">
+                </button>
+            </div>
+
             <img class="post-img" src="<%= post.image %>" alt="">
             <div class="icon-container">
                 <img class="icon-img" src="/imgs/like-unchecked.png" alt="like icon">
@@ -17,15 +26,36 @@
                 <%= post.description %>
             </p>
         </div>
-         <div id="more-container">
-                <form class="d-inline" action="/<%=post._id%>?_method=DELETE" method="POST">
-                    <button class="more-buttons" id="delete-button">Delete</button>
-                </form>
-                <button class="more-buttons" id="edit-button">Edit</button>
+        <div id="more-container">
+            <form class="d-inline" action="/<%=post._id%>?_method=DELETE" method="POST">
+                <button class="more-buttons" id="delete-button">Delete</button>
+            </form>
+            <button class="more-buttons" id="edit-button">Edit</button>
         </div>
-</div>
+    </div>
 
     <style>
+        .top-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .author-container{
+            display: flex;
+            align-items: center;
+            margin: 10px;
+            margin-left: 0px;
+        }
+
+        .profile-picture{
+            border-radius: 50%;
+            margin-right: 15px;
+            width: 32px;
+            height: 32px;
+        }
+
         .post-container {
             display: flex;
             flex-direction: column;
@@ -67,7 +97,6 @@
         }
 
         .more-button {
-            align-self: flex-end;
             border: 0px;
             background: transparent;
         }
@@ -106,8 +135,8 @@
             border-bottom: 1px solid gray;
         }
 
-        
-        #delete-button{
+
+        #delete-button {
             color: red;
         }
 
@@ -126,43 +155,43 @@
         }
     </style>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Get references to the button, the image, and the container
-        const moreButton = document.querySelector(".more-button img"); // Target the image inside the button
-        const editButton = document.getElementById("edit-button");
-        const moreContainer = document.getElementById("more-container");
-        const mainContent = document.querySelector(".main-content");
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get references to the button, the image, and the container
+            const moreButton = document.querySelector(".more-button img"); // Target the image inside the button
+            const editButton = document.getElementById("edit-button");
+            const moreContainer = document.getElementById("more-container");
+            const mainContent = document.querySelector(".main-content");
 
-        function disableScrolling() {
-            moreContainer.style.display = "none";
-            mainContent.style.overflow = "auto"; // Re-enable scrolling in main content
-        }
-
-        // Function to toggle the visibility of the more container and disable scrolling in the main content
-        function toggleMoreContainer() {
-            if (moreContainer.style.display === "none") {
-                moreContainer.style.display = "block";
-                mainContent.style.overflow = "hidden"; // Disable scrolling in main content
-            } else {
-                disableScrolling();
+            function disableScrolling() {
+                moreContainer.style.display = "none";
+                mainContent.style.overflow = "auto"; // Re-enable scrolling in main content
             }
-        }
 
-        // Add a click event listener to the more button image
-        moreButton.addEventListener("click", toggleMoreContainer);
+            // Function to toggle the visibility of the more container and disable scrolling in the main content
+            function toggleMoreContainer() {
+                if (moreContainer.style.display === "none") {
+                    moreContainer.style.display = "block";
+                    mainContent.style.overflow = "hidden"; // Disable scrolling in main content
+                } else {
+                    disableScrolling();
+                }
+            }
 
-        editButton.addEventListener("click", function () {
+            // Add a click event listener to the more button image
+            moreButton.addEventListener("click", toggleMoreContainer);
+
+            editButton.addEventListener("click", function () {
                 // Redirect to /id/edit
-                
+
                 window.location.href = `/<%=post._id%>/edit`;
             });
 
-        // Add a click event listener to the document to close the container when clicking outside of it
-        document.addEventListener("click", function (event) {
-            if (!moreContainer.contains(event.target) && event.target !== moreButton) {
-                disableScrolling();
-            }
+            // Add a click event listener to the document to close the container when clicking outside of it
+            document.addEventListener("click", function (event) {
+                if (!moreContainer.contains(event.target) && event.target !== moreButton) {
+                    disableScrolling();
+                }
+            });
         });
-    });
-</script>
+    </script>

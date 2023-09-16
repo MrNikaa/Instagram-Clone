@@ -18,12 +18,12 @@ const validatePost = (req, res, next) => {
   }
 
 router.get('/', async (req, res) => {
-    const posts = await Post.find({});
+    const posts = await Post.find({}).populate('author');
     res.render('home', { posts });
 });
 
 router.get('/post/:id', catchAsync(async (req, res) => {
-    const post = await Post.findById(req.params.id);
+    const post = await Post.findById(req.params.id).populate('author');
     if(!post){
         req.flash('error', 'Can not find the campground!');
         return res.redirect('/');
@@ -51,6 +51,7 @@ router.get('/createPost', isLoggedIn, (req, res) => {
 
 router.post('/', validatePost, isLoggedIn, catchAsync(async (req, res) => {
     const post = new Post(req.body.post);
+    post.author = req.user._id;
     await post.save();
     req.flash('success', 'Sucessfully made a new post!');
     res.redirect(`/post/${post._id}`);
