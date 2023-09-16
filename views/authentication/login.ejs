@@ -4,33 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram-Register</title>
+    <title>Instagram-Login</title>
 </head>
 
 <body>
     <div class="container">
         <%- include('../partials/flash')%>
             <h1 class="title">Instagram</h1>
-            <p class="text">Sign up to see photos and videos<br>from your friends.</p>
-            <form action="/register" method="POST" class="form">
-                <div class="form-group">
-                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
-                </div>
+            <form action="/login" method="POST" class="form">
                 <div class="form-group">
                     <input type="text" id="username" name="username" placeholder="Enter your username" required>
                 </div>
                 <div class="form-group">
-                    <input type="password" id="password" name="password" placeholder="Enter your password" required
-                        minlength="6">
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required>
                 </div>
                 <div class="form-group">
-                    <button type="submit">Sign Up</button>
+                    <button type="submit">Log In</button>
                 </div>
             </form>
     </div>
 
     <div class="login-container">
-        <p>Have an account? <a href="/login" class="login-link">Log in</a></p>
+        <p>Dont have an account yet? <a href="/register" class="register-link">Sign Up</a></p>
     </div>
 </body>
 
@@ -76,16 +71,9 @@
         justify-content: center;
     }
 
-    .login-link {
+    .register-link {
         color: #279EFF;
         text-decoration: none;
-    }
-
-    .text {
-        text-align: center;
-        color: #B7B7B7;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #D8D9DA;
     }
 
     .form {

@@ -19,7 +19,7 @@
         </div>
          <div id="more-container">
                 <form class="d-inline" action="/<%=post._id%>?_method=DELETE" method="POST">
-                    <button class="more-buttons">Delete</button>
+                    <button class="more-buttons" id="delete-button">Delete</button>
                 </form>
                 <button class="more-buttons" id="edit-button">Edit</button>
         </div>
@@ -101,9 +101,14 @@
             height: 10%;
             background: transparent;
             border: 0px;
-            color: red;
+            color: white;
             padding: 20px;
             border-bottom: 1px solid gray;
+        }
+
+        
+        #delete-button{
+            color: red;
         }
 
         .post-info-text {

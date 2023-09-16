@@ -4,6 +4,7 @@ const ExpressError = require('../utils/ExpressError')
 const {postSchema} = require('../schemas.js');
 const Post = require('../models/post');
 const router = express.Router();
+const {isLoggedIn} = require('../middleware');
 
 const validatePost = (req, res, next) => {
     const result = postSchema.validate(req.body)
@@ -30,7 +31,13 @@ router.get('/post/:id', catchAsync(async (req, res) => {
     res.render('show', { post });
 }));
 
-router.put('/post/:id', validatePost, catchAsync(async (req, res) => {
+router.get('/:id/edit', isLoggedIn, catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const post = await Post.findById(id);
+    res.render('edit', { post });
+}));
+
+router.put('/post/:id', validatePost, isLoggedIn, catchAsync(async (req, res) => {
     const { id } = req.params;
     const post = await Post.findByIdAndUpdate(id, { ...req.body.post });
     await post.save();
@@ -38,28 +45,23 @@ router.put('/post/:id', validatePost, catchAsync(async (req, res) => {
     res.redirect(`/post/${post._id}`)
 }));
 
-router.get('/createPost', (req, res) => {
+router.get('/createPost', isLoggedIn, (req, res) => {
     res.render('create');
 });
 
-router.post('/', validatePost, catchAsync(async (req, res) => {
+router.post('/', validatePost, isLoggedIn, catchAsync(async (req, res) => {
     const post = new Post(req.body.post);
     await post.save();
     req.flash('success', 'Sucessfully made a new post!');
     res.redirect(`/post/${post._id}`);
 }));
 
-router.delete('/:id', catchAsync(async (req, res) => {
+router.delete('/:id', isLoggedIn, catchAsync(async (req, res) => {
     const { id } = req.params;
     await Post.findByIdAndDelete(id);
     req.flash('success', 'Sucessfully deleted the post!');
     res.redirect('/');
 }));
 
-router.get('/:id/edit', catchAsync(async (req, res) => {
-    const { id } = req.params;
-    const post = await Post.findById(id);
-    res.render('edit', { post });
-}));
 
 module.exports = router;

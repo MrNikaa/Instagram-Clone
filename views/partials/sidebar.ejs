@@ -4,28 +4,28 @@
     <nav class="nav-area">
         <h1 class="title-logo">Instagram</h1>
 
-        <button class="btn-container" id="home-button">
+        <a class="btn-container" id="home-button" href="/">
             <img src="/imgs/home.png" alt="Home Button">
             <p class="btn-description">Home</p>
-        </button>
-        <button class="btn-container" id="create-button">
+        </a>
+        <a class="btn-container" id="create-button" href="/createPost">
             <img src="/imgs/create.png" alt="Create Button">
             <p class="btn-description">Create</p>
-        </button>
+        </a>
+        <% if(!currentUser){ %>
+        <a class="btn-container" id="logout-button" href="/login">
+            <img src="/imgs/create.png" alt="Logout Button">
+            <p class="btn-description">Log in</p>
+        </a>
+        <a class="btn-container" id="signup-button" href="/register">
+            <img src="/imgs/create.png" alt="Signup Button">
+            <p class="btn-description">Sign Up</p>
+        </a>
+        <% } else{ %>
+        <a class="btn-container" id="logout-button" href="/logout">
+            <img src="/imgs/create.png" alt="Logout Button">
+            <p class="btn-description">Log out</p>
+        </a>
+        <% } %>
     </nav>
 </div>
-
-<script>
-    // Get references to the buttons
-    const homeButton = document.getElementById("home-button");
-    const createButton = document.getElementById("create-button");
-
-    // Define onclick event handlers for the buttons
-    homeButton.onclick = function() {
-        window.location.href = "/";
-    };
-
-    createButton.onclick = function() {
-        window.location.href = "/createPost";
-    };
-</script>
