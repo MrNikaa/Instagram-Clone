@@ -28,15 +28,32 @@
                 </p>
             </div>
             <% } %>
-                <div id="more-container">
-                    <% if(currentUser && posts.author.equals(currentUser._id)){ %>
-                        <form id="myForm" method="POST">
-                            <button class="more-buttons" id="delete-button">Delete</button>
-                        </form>
-                        <button class="more-buttons" id="edit-button">Edit</button>
-                        <% } %>
-                            <button class="more-buttons" id="go-button">Go To Post</button>
-                </div>
+                <% for (let post of posts) { %>
+                    <div id="more-container-<%= post._id %>" class="more-container">
+                        <% console.log('Current user:', currentUser); %>
+                            <% console.log('Post author:', post.author); %>
+                                <% console.log('Is condition true:', currentUser && post.author &&
+                                    post.author.equals(currentUser._id)); %>
+                                    <% if(currentUser && post.author && post.author.equals(currentUser._id)){ %>
+                                        <% console.log("SHOWING EDIT AND DELETE"); %>
+                                            <form id="myForm" method="POST">
+                                                <button class="more-buttons" id="delete-button"
+                                                    style="display: block;">Delete</button>
+                                            </form>
+                                            <button class="more-buttons" id="edit-button"
+                                                style="display: block;">Edit</button>
+                                            <% } else { %>
+                                                <form id="myForm" method="POST">
+                                                    <button class="more-buttons" id="delete-button"
+                                                        style="display: none;">Delete</button>
+                                                </form>
+                                                <button class="more-buttons" id="edit-button"
+                                                    style="display: none;">Edit</button>
+                                                <% } %>
+
+                                                    <button class="more-buttons" id="go-button">Go To Post</button>
+                    </div>
+                    <% } %>
     </div>
 
     <style>
@@ -114,7 +131,7 @@
             filter: brightness(0.35);
         }
 
-        #more-container {
+        .more-container {
             position: fixed;
             width: 450px;
             height: 500px;
@@ -126,7 +143,6 @@
             /* Negative half of width. */
             background-color: #1F1E1E;
             display: none;
-            /* Initially hide the more container */
             border-radius: 25px;
         }
 
@@ -160,41 +176,50 @@
     </style>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const moreButtons = document.querySelectorAll(".more-button img");
-            const editButton = document.getElementById("edit-button");
-            const goButton = document.getElementById("go-button");
-            const moreContainer = document.getElementById("more-container");
-            const mainContent = document.querySelector(".main-content");
-            let postID;
-            const form = document.getElementById("myForm");
+        function toggleMoreContainer(postId) {
+            const moreContainers = document.querySelectorAll(".more-container");
+            const currentMoreContainer = document.getElementById(`more-container-${postId}`);
+            const mainContent = document.querySelector('.main-content');
+            const form = currentMoreContainer.querySelector("#myForm");
+            const editButton = currentMoreContainer.querySelector("#edit-button");
+            const goButton = currentMoreContainer.querySelector("#go-button");
 
-            function toggleMoreContainer(event) {
-                const clickedButton = event.currentTarget;
-                postID = clickedButton.dataset.postId;
-                form.action = `/${postID}/?_method=DELETE`;
 
-                if (moreContainer.style.display === "none") {
-                    //enable scroll
-                    moreContainer.style.display = "block";
-                    mainContent.style.overflow = "hidden";
-                } else {
-                    //disable scroll
-                    moreContainer.style.display = "none";
-                    mainContent.style.overflow = "auto";
+            form.action = `/${postId}/?_method=DELETE`;
+            
+            // Close all open containers
+            moreContainers.forEach(container => {
+                if (container !== currentMoreContainer) {
+                    container.style.display = "none";
                 }
+            });
+
+            // Toggle visibility for the current container
+            if (currentMoreContainer.style.display === "none") {
+                currentMoreContainer.style.display = "block";
+                mainContent.style.overflow = "hidden";
+            } else {
+                currentMoreContainer.style.display = "none";
+                mainContent.style.overflow = "auto";
             }
 
             editButton.addEventListener("click", function () {
-                window.location.href = `/${postID}/edit`;
+                window.location.href = `/${postId}/edit`;
             });
 
             goButton.addEventListener("click", function () {
-                window.location.href = `/post/${postID}`;
+                window.location.href = `/post/${postId}`;
             });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const moreButtons = document.querySelectorAll(".more-button img");
 
             for (let moreButton of moreButtons) {
-                moreButton.addEventListener("click", toggleMoreContainer);
+                moreButton.addEventListener("click", function () {
+                    const postID = moreButton.dataset.postId;
+                    toggleMoreContainer(postID);
+                });
             }
         });
     </script>

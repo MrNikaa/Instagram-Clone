@@ -165,10 +165,6 @@
             const moreContainer = document.getElementById("more-container");
             const mainContent = document.querySelector(".main-content");
 
-            function disableScrolling() {
-                moreContainer.style.display = "none";
-                mainContent.style.overflow = "auto"; // Re-enable scrolling in main content
-            }
 
             // Function to toggle the visibility of the more container and disable scrolling in the main content
             function toggleMoreContainer() {
@@ -176,7 +172,8 @@
                     moreContainer.style.display = "block";
                     mainContent.style.overflow = "hidden"; // Disable scrolling in main content
                 } else {
-                    disableScrolling();
+                    moreContainer.style.display = "none";
+                  mainContent.style.overflow = "auto"; // Re-enable scrolling in main content
                 }
             }
 
