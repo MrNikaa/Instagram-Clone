@@ -11,7 +11,7 @@
                         </p>
                     </div>
                     <button class="more-button">
-                        <img src="/imgs/more.png" alt="comment icon">
+                        <img src="/imgs/more.png" alt="comment icon" data-post-id="<%= post._id %>">
                     </button>
                 </div>
                 <img class="post-img" src="<%= post.image %>" alt="">
@@ -28,16 +28,15 @@
                 </p>
             </div>
             <% } %>
-
                 <div id="more-container">
-                    <form id="myForm" method="POST">
-                        <button class="more-buttons" id="delete-button">Delete</button>
-                    </form>
-                    <button class="more-buttons" id="edit-button">Edit</button>
-                    <button class="more-buttons" id="go-button">Go To Post</button>
+                    <% if(currentUser && posts.author.equals(currentUser._id)){ %>
+                        <form id="myForm" method="POST">
+                            <button class="more-buttons" id="delete-button">Delete</button>
+                        </form>
+                        <button class="more-buttons" id="edit-button">Edit</button>
+                        <% } %>
+                            <button class="more-buttons" id="go-button">Go To Post</button>
                 </div>
-
-
     </div>
 
     <style>
@@ -48,14 +47,14 @@
             width: 100%;
         }
 
-        .author-container{
+        .author-container {
             display: flex;
             align-items: center;
             margin: 10px;
             margin-left: 0px;
         }
 
-        .profile-picture{
+        .profile-picture {
             border-radius: 50%;
             margin-right: 15px;
             width: 32px;
@@ -131,8 +130,8 @@
             border-radius: 25px;
         }
 
-        #delete-button{
-            color:red;
+        #delete-button {
+            color: red;
         }
 
         .more-buttons {

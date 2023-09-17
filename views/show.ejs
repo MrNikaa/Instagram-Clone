@@ -27,10 +27,12 @@
             </p>
         </div>
         <div id="more-container">
+            <% if(currentUser && post.author.equals(currentUser._id)){ %>
             <form class="d-inline" action="/<%=post._id%>?_method=DELETE" method="POST">
                 <button class="more-buttons" id="delete-button">Delete</button>
             </form>
             <button class="more-buttons" id="edit-button">Edit</button>
+            <%}%>
         </div>
     </div>
 
