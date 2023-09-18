@@ -1,8 +1,17 @@
 const express = require('express');
 const User = require('../models/user');
+const Post = require('../models/post');
 const passport = require('passport');
 const catchAsync = require('../utils/catchAsync');
 const router = express.Router();
+
+router.get('/:id/profile', async (req, res) =>{
+    const { id } = req.params;
+    const postCount = await Post.countDocuments({ author: id });
+    const user = await User.findById(id);
+    console.log(user);
+    res.render('user/profile', {user, postCount});
+});
 
 router.get('/register', (req, res) => {
     res.render('authentication/register');
