@@ -4,9 +4,11 @@
             <div class="top-container">
                 <div class="author-container">
                     <img src="/imgs/pfp.png" class="profile-picture" alt="">
-                    <p>
-                        <%= post.author.username %>
-                    </p>
+                    <a href="/<%=post.author._id%>/profile">
+                        <p class="username-text">
+                            <%= post.author.username %>
+                        </p>
+                    </a>
                 </div>
                 <button class="more-button">
                     <img src="/imgs/more.png" alt="comment icon">
@@ -15,11 +17,15 @@
 
             <img class="post-img" src="<%= post.image %>" alt="">
             <div class="icon-container">
-                <img class="icon-img" src="/imgs/like-unchecked.png" alt="like icon">
+                <form action="/<%=post._id%>/like" method="POST">
+                    <button type="submit" class="like-button">
+                        <img src="/imgs/like-unchecked.png" alt="like icon" class="icon-img">
+                    </button>
+                </form>
                 <img class="icon-img" src="/imgs/comment.png" alt="comment icon">
                 <img class="icon-img" src="/imgs/forward.png" alt="forward icon">
             </div>
-            <p class="post-info-text">
+            <p class="post-info-text" id="like-count">
                 <%= post.likes %> Likes
             </p>
             <p class="post-info-text">
@@ -28,11 +34,11 @@
         </div>
         <div id="more-container">
             <% if(currentUser && post.author.equals(currentUser._id)){ %>
-            <form class="d-inline" action="/<%=post._id%>?_method=DELETE" method="POST">
-                <button class="more-buttons" id="delete-button">Delete</button>
-            </form>
-            <button class="more-buttons" id="edit-button">Edit</button>
-            <%}%>
+                <form class="d-inline" action="/<%=post._id%>?_method=DELETE" method="POST">
+                    <button class="more-buttons" id="delete-button">Delete</button>
+                </form>
+                <button class="more-buttons" id="edit-button">Edit</button>
+                <%}%>
         </div>
     </div>
 
@@ -44,14 +50,14 @@
             width: 100%;
         }
 
-        .author-container{
+        .author-container {
             display: flex;
             align-items: center;
             margin: 10px;
             margin-left: 0px;
         }
 
-        .profile-picture{
+        .profile-picture {
             border-radius: 50%;
             margin-right: 15px;
             width: 32px;
@@ -142,11 +148,24 @@
             color: red;
         }
 
+        .like-button {
+            width: 32px;
+            height: 32px;
+            margin-right: 6px;
+            background: transparent;
+            border: 0px;
+        }
+
         .post-info-text {
             font-family: sans-serif;
             color: white;
             align-self: flex-start;
             margin-bottom: 15px;
+        }
+
+        .username-text{
+            font-family: sans-serif;
+            color: white;
         }
 
         .post-info-text:nth-of-type(2) {
@@ -173,24 +192,39 @@
                     mainContent.style.overflow = "hidden"; // Disable scrolling in main content
                 } else {
                     moreContainer.style.display = "none";
-                  mainContent.style.overflow = "auto"; // Re-enable scrolling in main content
+                    mainContent.style.overflow = "auto"; // Re-enable scrolling in main content
                 }
             }
 
             // Add a click event listener to the more button image
+            if(moreButton){
             moreButton.addEventListener("click", toggleMoreContainer);
+            }
 
+            if(editButton){
             editButton.addEventListener("click", function () {
                 // Redirect to /id/edit
 
                 window.location.href = `/<%=post._id%>/edit`;
             });
+        }
 
             // Add a click event listener to the document to close the container when clicking outside of it
             document.addEventListener("click", function (event) {
                 if (!moreContainer.contains(event.target) && event.target !== moreButton) {
-                    disableScrolling();
+                    moreContainer.style.display = "none";
+                    mainContent.style.overflow = "auto"; // Re-enable scrolling in main content
                 }
+            });
+
+            const likeButtons = document.querySelectorAll('.like-button');
+            const likeCountElements = document.querySelectorAll('#like-count');
+
+            likeButtons.forEach((likeButton, index) => {
+                likeButton.addEventListener('click', async () => {
+                    const updatedLikeCount = parseInt(likeCountElements[index].innerText) + 1;
+                    likeCountElements[index].innerText = updatedLikeCount + " Likes";
+                });
             });
         });
     </script>

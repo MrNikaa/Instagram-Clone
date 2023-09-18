@@ -10,7 +10,7 @@ const postSchema = new Schema({
     },
     likes: {
         type: Number,
-        default: 0, // Set the default number of likes to 0
+        default: 0
       }
 });
 

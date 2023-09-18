@@ -2,7 +2,7 @@ const express = require('express');
 const catchAsync = require('../utils/catchAsync');
 const Post = require('../models/post');
 const router = express.Router();
-const {isLoggedIn, isAuthor, validatePost} = require('../middleware');
+const { isLoggedIn, isAuthor, validatePost } = require('../middleware');
 
 
 router.get('/', async (req, res) => {
@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
 
 router.get('/post/:id', catchAsync(async (req, res) => {
     const post = await Post.findById(req.params.id).populate('author');
-    if(!post){
+    if (!post) {
         req.flash('error', 'Can not find the campground!');
         return res.redirect('/');
     }
@@ -36,6 +36,14 @@ router.put('/post/:id', validatePost, isLoggedIn, isAuthor, catchAsync(async (re
 
 router.get('/createPost', isLoggedIn, (req, res) => {
     res.render('create');
+});
+
+router.post('/:id/like', async (req, res) => {
+    const { id } = req.params;
+    const post = await Post.findById(id);
+    post.likes += 1;
+    await post.save();
+    res.status(204).send();
 });
 
 router.post('/', validatePost, isLoggedIn, catchAsync(async (req, res) => {

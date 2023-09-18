@@ -7,7 +7,11 @@
                 <div class="info-container">
                     <div class="top">
                         <h1 class="username-text"><%= user.username %></h1>
+                        <% if(currentUser && user._id && user._id.equals(currentUser._id)){ %>
                         <button class="edit-button">Edit profile</button>
+                        <% }else{ %>
+                            <button class="follow-button">Follow</button>
+                        <% } %>
                     </div>
                     <div class="bottom">
                         <p class="info-text"><%= postCount %> post</p>
@@ -81,6 +85,16 @@
         .edit-button{
             padding: 2px 12px 2px 12px;
             background-color: #2F2E2E;
+            width: 25%;
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+        }
+
+        .follow-button{
+            padding: 2px 12px 2px 12px;
+            background-color: #279EFF;
             width: 25%;
             color: white;
             font-weight: bold;
