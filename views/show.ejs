@@ -19,14 +19,14 @@
             <div class="icon-container">
                 <form action="/<%=post._id%>/like" method="POST">
                     <button type="submit" class="like-button">
-                        <img src="/imgs/like-unchecked.png" alt="like icon" class="icon-img">
+                        <img src="/imgs/like-unchecked.png" alt="like icon" class="icon-img" id="like-img">
                     </button>
                 </form>
                 <img class="icon-img" src="/imgs/comment.png" alt="comment icon">
                 <img class="icon-img" src="/imgs/forward.png" alt="forward icon">
             </div>
             <p class="post-info-text" id="like-count">
-                <%= post.likes %> Likes
+                <%= post.likes.length %> Likes
             </p>
             <p class="post-info-text">
                 <%= post.description %>
@@ -163,7 +163,7 @@
             margin-bottom: 15px;
         }
 
-        .username-text{
+        .username-text {
             font-family: sans-serif;
             color: white;
         }
@@ -197,17 +197,17 @@
             }
 
             // Add a click event listener to the more button image
-            if(moreButton){
-            moreButton.addEventListener("click", toggleMoreContainer);
+            if (moreButton) {
+                moreButton.addEventListener("click", toggleMoreContainer);
             }
 
-            if(editButton){
-            editButton.addEventListener("click", function () {
-                // Redirect to /id/edit
+            if (editButton) {
+                editButton.addEventListener("click", function () {
+                    // Redirect to /id/edit
 
-                window.location.href = `/<%=post._id%>/edit`;
-            });
-        }
+                    window.location.href = `/<%=post._id%>/edit`;
+                });
+            }
 
             // Add a click event listener to the document to close the container when clicking outside of it
             document.addEventListener("click", function (event) {
@@ -217,14 +217,41 @@
                 }
             });
 
-            const likeButtons = document.querySelectorAll('.like-button');
-            const likeCountElements = document.querySelectorAll('#like-count');
+                const likeButton = document.querySelector('.like-button');
+                const postID = "<%=post._id%>";
+                const likeText = document.getElementById("like-count");
+                const likeImg = document.querySelector("#like-img");
+                const currentUser = <%- JSON.stringify(currentUser) %>;
+                let userID;
 
-            likeButtons.forEach((likeButton, index) => {
-                likeButton.addEventListener('click', async () => {
-                    const updatedLikeCount = parseInt(likeCountElements[index].innerText) + 1;
-                    likeCountElements[index].innerText = updatedLikeCount + " Likes";
-                });
+                if (currentUser) {
+                    userID = currentUser._id;
+                }
+
+                if (userID) {
+                    const isLikedByUser = localStorage.getItem(`like-${userID}-${postID}`) === 'true';
+                    if (isLikedByUser) {
+                        likeImg.src = '/imgs/like-checked.png';
+                    }
+                    likeButton.addEventListener('click', async () => {
+                        const alreadyLiked = likeImg.src.includes('like-checked.png');
+                        localStorage.setItem(`like-${userID}-${postID}`, !alreadyLiked);
+
+                        // Update the like button image
+                        if (alreadyLiked) {
+                            likeImg.src = '/imgs/like-unchecked.png';
+                            console.log('dislik');
+                            currentLikes = parseInt(likeText.innerText);
+                            likeText.innerText = `${currentLikes - 1} Likes`;
+                        } else {
+                            likeImg.src = '/imgs/like-checked.png';
+                            currentLikes = parseInt(likeText.innerText);
+                            console.log('lik');
+                            likeText.innerText = `${currentLikes + 1} Likes`;
+                        }
+                    });
+                } else {
+                    likeImg.src = '/imgs/like-unchecked.png';
+                }
             });
-        });
     </script>
