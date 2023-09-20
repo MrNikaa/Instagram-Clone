@@ -16,7 +16,6 @@ router.get('/:id/profile', async (req, res) =>{
 router.get('/register', (req, res) => {
     res.render('authentication/register');
 });
-
 router.post('/register', catchAsync(async (req, res, next) => {
     try {
         const { email, username, password } = req.body;

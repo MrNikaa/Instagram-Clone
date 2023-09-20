@@ -38,14 +38,6 @@ router.get('/createPost', isLoggedIn, (req, res) => {
     res.render('create');
 });
 
-router.post('/:id/like', async (req, res) => {
-    const { id } = req.params;
-    const post = await Post.findById(id);
-    post.likes += 1;
-    await post.save();
-    res.status(204).send();
-});
-
 router.post('/', validatePost, isLoggedIn, catchAsync(async (req, res) => {
     const post = new Post(req.body.post);
     post.author = req.user._id;
@@ -53,6 +45,26 @@ router.post('/', validatePost, isLoggedIn, catchAsync(async (req, res) => {
     req.flash('success', 'Sucessfully made a new post!');
     res.redirect(`/post/${post._id}`);
 }));
+
+router.post('/:id/like', isLoggedIn, catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const post = await Post.findById(id).populate('likes');
+  
+    // Check if the user has already liked the post
+    const alreadyLiked = post.likes.some(userId => userId.equals(req.user._id));
+    
+    if (alreadyLiked) {
+      // If the user has already liked the post, remove the like
+      post.likes.pull(req.user._id);
+    } else {
+      // If the user hasn't liked the post, add a like
+      post.likes.push(req.user._id);
+    }
+  
+    await post.save();
+    res.status(204).send(); // Respond with success status
+  }));
+  
 
 router.delete('/:id', isLoggedIn, isAuthor, catchAsync(async (req, res) => {
     const { id } = req.params;
