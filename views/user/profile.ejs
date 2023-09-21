@@ -6,16 +6,31 @@
                 <img src="/imgs/pfp.png" alt="Profile picture" class="pfp">
                 <div class="info-container">
                     <div class="top">
-                        <h1 class="username-text"><%= user.username %></h1>
+                        <h1 class="username-text">
+                            <%= user.username %>
+                        </h1>
                         <% if(currentUser && user._id && user._id.equals(currentUser._id)){ %>
-                        <button class="edit-button">Edit profile</button>
-                        <% }else{ %>
-                            <button class="follow-button">Follow</button>
-                        <% } %>
+                            <button class="edit-button">Edit profile</button>
+                            <% }else{ %>
+                                <form action="/<%=user._id%>/profile/follow" method="POST">
+                                    <% if(currentUser){ %>
+                                        <button type="submit" class="follow-button"
+                                            data-following="<%= user.followers.includes(currentUser._id) %>">
+                                            <%= user.followers.includes(currentUser._id) ? 'Unfollow' : 'Follow' %>
+                                        </button>
+                                        <% }else{%>
+                                            <button type="submit" class="follow-button">Follow</button>
+                                            <% } %>
+                                </form>
+                                <% } %>
                     </div>
                     <div class="bottom">
-                        <p class="info-text"><%= postCount %> post</p>
-                        <p class="info-text">77 followers</p>
+                        <p class="info-text">
+                            <%= postCount %> post
+                        </p>
+                        <p class="info-text" id="followers-text">
+                            <%=user.followers.length%> followers
+                        </p>
                         <p class="info-text">332 following</p>
                     </div>
                 </div>
@@ -62,13 +77,13 @@
             border: 1px solid red;
         }
 
-        .top{
+        .top {
             display: flex;
             flex-direction: row;
             margin: 10px;
         }
-        
-        .bottom{
+
+        .bottom {
             display: flex;
             flex-direction: row;
             align-items: center;
@@ -77,12 +92,12 @@
             margin: 10px;
         }
 
-        .info-text{
+        .info-text {
             margin: 5px;
             margin-right: 20px;
         }
 
-        .edit-button{
+        .edit-button {
             padding: 2px 12px 2px 12px;
             background-color: #2F2E2E;
             width: 25%;
@@ -92,18 +107,25 @@
             border-radius: 6px;
         }
 
-        .follow-button{
-            padding: 2px 12px 2px 12px;
+        form {
+            margin: 0px;
+            align-self: center;
+        }
+
+        form .follow-button {
+            margin: 0;
+            padding: 8px 16px;
             background-color: #279EFF;
-            width: 25%;
+            width: 100%;
             color: white;
             font-weight: bold;
             border: none;
             border-radius: 6px;
+            box-sizing: border-box;
         }
 
-        .username-text{
-            font-family:Arial, Helvetica, sans-serif;
+        .username-text {
+            font-family: Arial, Helvetica, sans-serif;
             font-weight: lighter;
             font-size: 30px;
             margin-right: 25px;
@@ -117,3 +139,24 @@
             border: 1px solid red;
         }
     </style>
+
+    <script>
+        const followButton = document.querySelector('.follow-button');
+        const followersText = document.getElementById('followers-text');
+
+        followButton.addEventListener('click', () => {
+            const isFollowing = followButton.getAttribute('data-following') === 'true';
+
+            if (isFollowing) {
+                followButton.innerText = 'Follow';
+                followButton.setAttribute('data-following', 'false');
+                currentFollowers = parseInt(followersText.innerText);
+                followersText.innerText = `${currentFollowers - 1} followers`;
+            } else {
+                followButton.innerText = 'Unfollow';
+                followButton.setAttribute('data-following', 'true');
+                currentFollowers = parseInt(followersText.innerText);
+                followersText.innerText = `${currentFollowers + 1} followers`;
+            }
+        });
+    </script>

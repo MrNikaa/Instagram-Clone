@@ -9,7 +9,11 @@ const userSchema = new Schema({
         required: true,
         unique: true
     },
-    profilePicture: String
+    profilePicture: String,
+    followers: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    }]
 });
 
 userSchema.plugin(passportlocalMongoose);

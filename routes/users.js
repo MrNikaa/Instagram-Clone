@@ -3,15 +3,33 @@ const User = require('../models/user');
 const Post = require('../models/post');
 const passport = require('passport');
 const catchAsync = require('../utils/catchAsync');
+const { isLoggedIn } = require('../middleware');
 const router = express.Router();
 
-router.get('/:id/profile', async (req, res) =>{
+router.get('/:id/profile', catchAsync(async (req, res) => {
     const { id } = req.params;
     const postCount = await Post.countDocuments({ author: id });
     const user = await User.findById(id);
-    console.log(user);
-    res.render('user/profile', {user, postCount});
-});
+    if (req.user) {
+        const alreadyFollowing = user.followers.some(userId => userId.equals(req.user._id));
+    }
+    res.render('user/profile', { user, postCount });
+}));
+
+router.post('/:id/profile/follow', isLoggedIn, catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    const alreadyFollowing = user.followers.some(userId => userId.equals(req.user._id));
+
+    if (alreadyFollowing) {
+        user.followers.pull(req.user._id);
+    } else {
+        user.followers.push(req.user._id);
+    }
+
+    await user.save();
+    res.status(204).send();
+}));
 
 router.get('/register', (req, res) => {
     res.render('authentication/register');

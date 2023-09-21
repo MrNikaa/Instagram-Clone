@@ -50,19 +50,16 @@ router.post('/:id/like', isLoggedIn, catchAsync(async (req, res) => {
     const { id } = req.params;
     const post = await Post.findById(id).populate('likes');
   
-    // Check if the user has already liked the post
     const alreadyLiked = post.likes.some(userId => userId.equals(req.user._id));
     
     if (alreadyLiked) {
-      // If the user has already liked the post, remove the like
       post.likes.pull(req.user._id);
     } else {
-      // If the user hasn't liked the post, add a like
       post.likes.push(req.user._id);
     }
   
     await post.save();
-    res.status(204).send(); // Respond with success status
+    res.status(204).send();
   }));
   
 
