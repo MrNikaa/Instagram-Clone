@@ -37,6 +37,28 @@
             </div>
 
         </div>
+
+        <div class="followers-container">
+            <% for (let follower of followingUsers) { %>
+                <% if (currentUser && currentUser._id.equals(follower._id)) continue; %>
+                    <div class="user-container">
+                        <div class="follower-info-container">
+                            <img src="/imgs/pfp.png" alt="">
+                            <a href="/<%=follower._id%>/profile">
+                                <%=follower.username%>
+                            </a>
+                            <form action="/<%= follower._id %>/profile/follow" method="POST">
+                                <button type="submit" class="follow-button-follower" data-user-id="<%= follower._id %>"
+                                    data-following="<%= currentUser && follower.followers.includes(currentUser._id) %>">
+                                    <%= currentUser && follower.followers.includes(currentUser._id) ? 'Unfollow'
+                                        : 'Follow' %>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <%}%>
+        </div>
+
     </div>
 
     <style>
@@ -92,6 +114,88 @@
             margin: 10px;
         }
 
+        .followers-container {
+            position: fixed;
+            width: 450px;
+            height: 500px;
+            top: 50%;
+            left: 50%;
+            margin-top: -250px;
+            /* Negative half of height. */
+            margin-left: -225px;
+            /* Negative half of width. */
+            background-color: #1F1E1E;
+            display: none;
+            border-radius: 25px;
+            overflow-y: scroll
+        }
+
+        .user-container {
+            display: flex;
+            flex-direction: column;
+            border-radius: 25px;
+            margin-bottom: 8px;
+            height: 10%;
+        }
+
+        .follower-info-container {
+            display: flex;
+            flex-direction: row;
+            /* Align elements to start and end */
+            padding-left: 10px;
+            padding-right: 10px;
+            width: 95%;
+            height: 100%;
+            align-items: center;
+            border-radius: 25px;
+        }
+
+        .follower-info-container img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid gray;
+        }
+
+        .follower-info-container a {
+            color: white;
+            text-decoration: none1;
+            margin-left: 15px;
+        }
+
+        .follow-button-follower{
+            margin-left: 200px;
+            padding: 8px 16px;
+            background-color: #279EFF;
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .follower-info-container .following{
+            background-color: #4a4a4a;
+        }
+
+        .followers-container::-webkit-scrollbar {
+            width: 17px;
+            /* Width of the scrollbar */
+        }
+
+        .followers-container::-webkit-scrollbar-thumb {
+            background-color: #4a4a4a;
+            /* Color of the scrollbar thumb */
+            border-radius: 6px;
+            /* Rounded corners */
+        }
+
+        .followers-container::-webkit-scrollbar-track {
+            background-color: #1F1E1E;
+            /* Color of the scrollbar track */
+        }
+
+
         .info-text {
             margin: 5px;
             margin-right: 20px;
@@ -107,16 +211,10 @@
             border-radius: 6px;
         }
 
-        form {
-            margin: 0px;
-            align-self: center;
-        }
-
-        form .follow-button {
+        .follow-button {
             margin: 0;
             padding: 8px 16px;
             background-color: #279EFF;
-            width: 100%;
             color: white;
             font-weight: bold;
             border: none;
@@ -142,21 +240,84 @@
 
     <script>
         const followButton = document.querySelector('.follow-button');
+        const followButtonFollower = document.querySelector('.follow-button-follower');
         const followersText = document.getElementById('followers-text');
+        const followersContainer = document.querySelector('.followers-container');
+        const isCurrentlyFollowing = followButtonFollower.getAttribute('data-following') === 'true';
 
-        followButton.addEventListener('click', () => {
-            const isFollowing = followButton.getAttribute('data-following') === 'true';
 
-            if (isFollowing) {
-                followButton.innerText = 'Follow';
-                followButton.setAttribute('data-following', 'false');
-                currentFollowers = parseInt(followersText.innerText);
-                followersText.innerText = `${currentFollowers - 1} followers`;
-            } else {
-                followButton.innerText = 'Unfollow';
-                followButton.setAttribute('data-following', 'true');
-                currentFollowers = parseInt(followersText.innerText);
-                followersText.innerText = `${currentFollowers + 1} followers`;
+        if (followButton) {
+            followButton.addEventListener('click', () => {
+                const isFollowing = followButton.getAttribute('data-following') === 'true';
+
+                if (isFollowing) {
+                    followButton.innerText = 'Follow';
+                    followButton.setAttribute('data-following', 'false');
+                    currentFollowers = parseInt(followersText.innerText);
+                    followersText.innerText = `${currentFollowers - 1} followers`;
+                } else {
+                    followButton.innerText = 'Unfollow';
+                    followButton.setAttribute('data-following', 'true');
+                    currentFollowers = parseInt(followersText.innerText);
+                    followersText.innerText = `${currentFollowers + 1} followers`;
+                }
+            });
+        }
+
+        if (followButtonFollower) {
+            followButtonFollower.addEventListener('click', () => {
+                const isFollowing = followButtonFollower.getAttribute('data-following') === 'true';
+
+                if (isFollowing) {
+                    followButtonFollower.innerText = 'Follow';
+                    followButtonFollower.classList.remove('following');
+                    followButtonFollower.setAttribute('data-following', 'false');
+                } else {
+                    followButtonFollower.innerText = 'Unfollow';
+                    followButtonFollower.classList.add('following');
+                    followButtonFollower.setAttribute('data-following', 'true');
+                }
+            });
+        }
+
+        if(isCurrentlyFollowing){
+            followButtonFollower.classList.add('following');
+        }   
+        else{
+            followButtonFollower.classList.remove('following');
+        }
+
+        followersText.addEventListener('click', () => {
+
+            if (followersContainer.style.display === "none") {
+                followersContainer.style.display = "block";
+            }
+            else {
+                followersContainer.style.display = "none";
             }
         });
+
+        function isClickOutside(event) {
+            const followersText = document.getElementById('followers-text');
+            return followersContainer.style.display === 'block' &&
+                !followersContainer.contains(event.target) &&
+                !followersText.contains(event.target);
+        }
+
+        document.addEventListener('click', (event) => {
+            if (isClickOutside(event)) {
+                followersContainer.style.display = 'none';
+            }
+        });
+
+        window.addEventListener("pageshow", function (event) {
+            var historyTraversal = event.persisted ||
+                (typeof window.performance != "undefined" &&
+                    window.performance.navigation.type === 2);
+            if (historyTraversal) {
+                // Handle page restore.
+                window.location.reload();
+            }
+        });
+
     </script>

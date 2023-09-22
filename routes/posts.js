@@ -6,12 +6,16 @@ const { isLoggedIn, isAuthor, validatePost } = require('../middleware');
 
 
 router.get('/', async (req, res) => {
-    const posts = await Post.find({}).populate('author');
-    res.render('home', { posts });
+    const posts = await Post.find({}).populate('author').populate('likes');
+    posts.forEach(post => {
+        console.log(`Likes for post ${post._id}:`, post.likes);
+    });
+    const reversedPosts = posts.slice().reverse();
+    res.render('home', { reversedPosts });
 });
 
 router.get('/post/:id', catchAsync(async (req, res) => {
-    const post = await Post.findById(req.params.id).populate('author');
+    const post = await Post.findById(req.params.id).populate('author').populate('likes');
     if (!post) {
         req.flash('error', 'Can not find the campground!');
         return res.redirect('/');

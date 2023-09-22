@@ -1,7 +1,7 @@
 <% layout('layouts/boilerplate') %>
 
     <div class="main-content">
-        <% for (let post of posts) { %>
+        <% for (let post of reversedPosts) { %>
             <div class="post-container">
                 <div class="top-container">
                     <div class="author-container">
@@ -35,7 +35,7 @@
                 </p>
             </div>
             <% } %>
-                <% for (let post of posts) { %>
+                <% for (let post of reversedPosts) { %>
                     <div id="more-container-<%= post._id %>" class="more-container">
                         <% if(currentUser && post.author && post.author.equals(currentUser._id)){ %>
                             <form id="myForm" method="POST">
@@ -51,6 +51,33 @@
                                 <% } %>
 
                                     <button class="more-buttons" id="go-button">Go To Post</button>
+                                    <button class="more-buttons" id="copy-button">Copy Link</button>
+                    </div>
+
+                    <div class="likes-container">
+                        <% for (let post of reversedPosts) { %>
+                            <% for (let liker of post.likes) { %>
+                                <% if(liker){ %>
+                                    <% if (currentUser && currentUser._id.equals(liker._id)) continue; %>
+                                        <div class="user-container">
+                                            <div class="liker-info-container">
+                                                <img src="/imgs/pfp.png" alt="">
+                                                <a href="/<%=liker._id%>/profile">
+                                                    <%=liker.username%>
+                                                </a>
+                                                <form action="/<%= liker._id %>/profile/follow" method="POST">
+                                                    <button type="submit" class="follow-button-follower"
+                                                        data-user-id="<%= liker._id %>"
+                                                        data-following="<%= currentUser && liker.followers.includes(currentUser._id) %>">
+                                                        <%= currentUser && liker.followers.includes(currentUser._id)
+                                                            ? 'Unfollow' : 'Follow' %>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                        <% } %>
+                                            <% } %>
+                                                <% } %>
                     </div>
                     <% } %>
     </div>
@@ -167,6 +194,88 @@
             border-bottom: 1px solid gray;
         }
 
+        .likes-container {
+            position: fixed;
+            width: 450px;
+            height: 500px;
+            top: 50%;
+            left: 50%;
+            margin-top: -250px;
+            /* Negative half of height. */
+            margin-left: -225px;
+            /* Negative half of width. */
+            background-color: #1F1E1E;
+            display: none;
+            border-radius: 25px;
+            overflow-y: scroll
+        }
+
+        .user-container {
+            display: flex;
+            flex-direction: column;
+            border-radius: 25px;
+            margin-bottom: 8px;
+            height: 10%;
+        }
+
+        .liker-info-container {
+            display: flex;
+            flex-direction: row;
+            /* Align elements to start and end */
+            padding-left: 10px;
+            padding-right: 10px;
+            width: 95%;
+            height: 100%;
+            align-items: center;
+            border-radius: 25px;
+        }
+
+        .liker-info-container img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid gray;
+        }
+
+        .liker-info-container a {
+            color: white;
+            text-decoration: none1;
+            margin-left: 15px;
+        }
+
+        .follow-button-follower {
+            margin-left: 200px;
+            padding: 8px 16px;
+            background-color: #279EFF;
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        .liker-info-container .following {
+            background-color: #4a4a4a;
+        }
+
+
+        .likes-container::-webkit-scrollbar {
+            width: 17px;
+            /* Width of the scrollbar */
+        }
+
+        .likes-container::-webkit-scrollbar-thumb {
+            background-color: #4a4a4a;
+            /* Color of the scrollbar thumb */
+            border-radius: 6px;
+            /* Rounded corners */
+        }
+
+        .likes-container::-webkit-scrollbar-track {
+            background-color: #1F1E1E;
+            /* Color of the scrollbar track */
+        }
+
         .post-info-text {
             font-family: sans-serif;
             color: white;
@@ -188,6 +297,17 @@
     </style>
 
     <script>
+        function copyPostLink(postId) {
+            const postLink = `${window.location.origin}/post/${postId}`;
+
+            const tempInput = document.createElement('input');
+            tempInput.value = postLink;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+        }
+
         function toggleMoreContainer(postId) {
             const moreContainers = document.querySelectorAll(".more-container");
             const currentMoreContainer = document.getElementById(`more-container-${postId}`);
@@ -195,6 +315,7 @@
             const form = currentMoreContainer.querySelector("#myForm");
             const editButton = currentMoreContainer.querySelector("#edit-button");
             const goButton = currentMoreContainer.querySelector("#go-button");
+            const copyButton = currentMoreContainer.querySelector("#copy-button");
 
             form.action = `/${postId}/?_method=DELETE`;
 
@@ -221,6 +342,18 @@
             goButton.addEventListener("click", function () {
                 window.location.href = `/post/${postId}`;
             });
+
+            copyButton.addEventListener("click", function () {
+                copyPostLink(postId);
+            });
+        }
+
+        function isClickOutside(event, postId) {
+            const likesText = document.getElementById(`like-count-${postId}`);
+            const likesContainer = document.querySelector('.likes-container');
+            return likesContainer.style.display === 'block' &&
+                !likesContainer.contains(event.target) &&
+                !likesText.contains(event.target);
         }
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -235,7 +368,7 @@
 
             const likeButtons = document.querySelectorAll('.like-button');
 
-            likeButtons.forEach((likeButton) => {
+            for (let likeButton of likeButtons) {
                 const postID = likeButton.dataset.postid;
                 const likeText = document.getElementById(`like-count-${postID}`);
                 const likeImg = document.getElementById(`like-img-${postID}`);
@@ -246,12 +379,13 @@
                     userID = currentUser._id;
                 }
 
+                //Handle liking, updating instantly, keepnig local storage
                 if (userID) {
                     const isLikedByUser = localStorage.getItem(`like-${userID}-${postID}`) === 'true';
                     if (isLikedByUser) {
                         likeImg.src = '/imgs/like-checked.png';
                     }
-                    likeButton.addEventListener('click', async () => {
+                    likeButton.addEventListener('click', () => {
                         const alreadyLiked = likeImg.src.includes('like-checked.png');
                         localStorage.setItem(`like-${userID}-${postID}`, !alreadyLiked);
 
@@ -266,9 +400,63 @@
                             likeText.innerText = `${currentLikes + 1} Likes`;
                         }
                     });
+
+
+                    //Handle follow button updating in the like-container, keeping local torage
+                    const followButtons = document.querySelectorAll('.follow-button-follower');
+                    for (let followButton of followButtons) {
+                        const postID = followButton.dataset.userId;
+                        const storageKey = `follow-${userID}-${postID}`;
+                        const isFollowing = localStorage.getItem(storageKey) === 'true';
+
+                        if (isFollowing) {
+                            followButton.classList.add('following');
+                        }
+
+                        followButton.addEventListener("click", function () {
+                            if (followButton.innerText === "Follow") {
+                                followButton.classList.add('following');
+                                followButton.innerText = "Unfollow";
+                                localStorage.setItem(storageKey, 'true');  // Save follow state
+                            } else {
+                                followButton.classList.remove('following');
+                                followButton.innerText = "Follow";
+                                localStorage.removeItem(storageKey);  // Remove follow state
+                            }
+                        });
+                    }
+
+                    //Handle showing like container when text is clicked
+                    const likesContainer = document.querySelector('.likes-container');
+                    likeText.addEventListener('click', () => {
+                        if (likesContainer.style.display === "none") {
+                            likesContainer.style.display = "block";
+                        } else {
+                            likesContainer.style.display = "none";
+                        }
+                    });
+
+                    //Hanlde hiding the like container iif something else is clicked
+                    document.addEventListener('click', (event) => {
+                        const likesContainer = document.querySelector('.likes-container');
+                        if (isClickOutside(event, postID)) {
+                            likesContainer.style.display = 'none';
+                        }
+                    })
                 } else {
                     likeImg.src = '/imgs/like-unchecked.png';
                 }
-            });
+            }
+        });
+
+
+        window.addEventListener("pageshow", (event) => {
+            const historyTraversal = event.persisted ||
+                (typeof window.performance != "undefined" &&
+                    window.performance.navigation.type === 2);
+            if (historyTraversal) {
+                // Handle page restore.
+                window.location.reload();
+            }
         });
     </script>

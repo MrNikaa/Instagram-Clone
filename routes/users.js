@@ -10,10 +10,16 @@ router.get('/:id/profile', catchAsync(async (req, res) => {
     const { id } = req.params;
     const postCount = await Post.countDocuments({ author: id });
     const user = await User.findById(id);
+    const followingUsers = [];
+    const followers = user.followers;
+    for (follower of followers) {
+        const followUser = await User.findById(follower._id);
+        followingUsers.push(followUser);
+    }
     if (req.user) {
         const alreadyFollowing = user.followers.some(userId => userId.equals(req.user._id));
     }
-    res.render('user/profile', { user, postCount });
+    res.render('user/profile', { user, postCount, followingUsers });
 }));
 
 router.post('/:id/profile/follow', isLoggedIn, catchAsync(async (req, res) => {
