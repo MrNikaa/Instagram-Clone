@@ -3,12 +3,16 @@ const User = require('../models/user');
 const Post = require('../models/post');
 const passport = require('passport');
 const catchAsync = require('../utils/catchAsync');
+const multer = require('multer');
+const {storage, cloudinary} = require('../cloudinary');
+const upload = multer(storage);
 const { isLoggedIn } = require('../middleware');
 const router = express.Router();
 
 router.get('/:id/profile', catchAsync(async (req, res) => {
     const { id } = req.params;
     const postCount = await Post.countDocuments({ author: id });
+    const userPosts = await Post.find({ author: id });
     const user = await User.findById(id);
     const followingUsers = [];
     const followers = user.followers;
@@ -16,10 +20,7 @@ router.get('/:id/profile', catchAsync(async (req, res) => {
         const followUser = await User.findById(follower._id);
         followingUsers.push(followUser);
     }
-    if (req.user) {
-        const alreadyFollowing = user.followers.some(userId => userId.equals(req.user._id));
-    }
-    res.render('user/profile', { user, postCount, followingUsers });
+    res.render('user/profile', { user, postCount, followingUsers, userPosts});
 }));
 
 router.post('/:id/profile/follow', isLoggedIn, catchAsync(async (req, res) => {
@@ -40,10 +41,15 @@ router.post('/:id/profile/follow', isLoggedIn, catchAsync(async (req, res) => {
 router.get('/register', (req, res) => {
     res.render('authentication/register');
 });
-router.post('/register', catchAsync(async (req, res, next) => {
+router.post('/register', upload.single('image'), catchAsync(async (req, res, next) => {
     try {
+        const base64String = req.file.buffer.toString('base64');
+        const result = await cloudinary.uploader.upload(`data:image/png;base64,${base64String}`, {
+            resource_type: 'image'
+        });;
         const { email, username, password } = req.body;
         const user = new User({ email, username });
+        user.profilePicture = {url:result.url}; 
         const registeredUser = await User.register(user, password);
         req.login(registeredUser, err => {
             if (err) return next(err);

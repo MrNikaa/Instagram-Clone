@@ -12,7 +12,7 @@
         <%- include('../partials/flash')%>
             <h1 class="title">Instagram</h1>
             <p class="text">Sign up to see photos and videos<br>from your friends.</p>
-            <form action="/register" method="POST" class="form">
+            <form action="/register" method="POST" class="form" enctype="multipart/form-data">
                 <div class="form-group">
                     <input type="email" id="email" name="email" placeholder="Enter your email" required>
                 </div>
@@ -23,6 +23,9 @@
                     <input type="password" id="password" name="password" placeholder="Enter your password" required
                         minlength="6">
                 </div>
+
+                <input type="file" name="image">
+                
                 <div class="form-group">
                     <button type="submit">Sign Up</button>
                 </div>

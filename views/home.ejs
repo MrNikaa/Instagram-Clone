@@ -5,7 +5,7 @@
             <div class="post-container">
                 <div class="top-container">
                     <div class="author-container">
-                        <img src="/imgs/pfp.png" class="profile-picture" alt="">
+                        <img src="<%=post.author.profilePicture.url%>" class="profile-picture" alt="">
                         <a href="/<%=post.author._id%>/profile">
                             <p class="username-text">
                                 <%= post.author.username %>
@@ -16,7 +16,7 @@
                         <img src="/imgs/more.png" alt="comment icon" data-post-id="<%= post._id %>">
                     </button>
                 </div>
-                <img class="post-img" src="<%= post.image %>" alt="">
+                <img class="post-img" src="<%= post.image.url %>" alt="">
                 <div class="icon-container">
                     <form action="/<%=post._id%>/like" method="POST">
                         <button type="submit" class="like-button" data-postId="<%= post._id %>">
@@ -61,7 +61,7 @@
                                     <% if (currentUser && currentUser._id.equals(liker._id)) continue; %>
                                         <div class="user-container">
                                             <div class="liker-info-container">
-                                                <img src="/imgs/pfp.png" alt="">
+                                                <img src="<%=liker.profilePicture.url%>" alt="">
                                                 <a href="/<%=liker._id%>/profile">
                                                     <%=liker.username%>
                                                 </a>
@@ -372,8 +372,14 @@
                 const postID = likeButton.dataset.postid;
                 const likeText = document.getElementById(`like-count-${postID}`);
                 const likeImg = document.getElementById(`like-img-${postID}`);
-                const currentUser = <%- JSON.stringify(currentUser) %>;
                 let userID;
+                let currentUser = null;
+
+                const currentUserJSON = `<%- JSON.stringify(currentUser) %>`;
+
+                if (currentUserJSON !== 'undefined') {
+                    currentUser = JSON.parse(currentUserJSON);
+                }
 
                 if (currentUser) {
                     userID = currentUser._id;

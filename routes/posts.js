@@ -2,14 +2,14 @@ const express = require('express');
 const catchAsync = require('../utils/catchAsync');
 const Post = require('../models/post');
 const router = express.Router();
+const multer = require('multer');
+const {storage, cloudinary} = require('../cloudinary');
+const upload = multer(storage);
 const { isLoggedIn, isAuthor, validatePost } = require('../middleware');
 
 
 router.get('/', async (req, res) => {
     const posts = await Post.find({}).populate('author').populate('likes');
-    posts.forEach(post => {
-        console.log(`Likes for post ${post._id}:`, post.likes);
-    });
     const reversedPosts = posts.slice().reverse();
     res.render('home', { reversedPosts });
 });
@@ -42,11 +42,19 @@ router.get('/createPost', isLoggedIn, (req, res) => {
     res.render('create');
 });
 
-router.post('/', validatePost, isLoggedIn, catchAsync(async (req, res) => {
+router.post('/', isLoggedIn, upload.single('image'), validatePost, catchAsync(async (req, res) => {
+    const base64String = req.file.buffer.toString('base64');
+    const result = await cloudinary.uploader.upload(`data:image/png;base64,${base64String}`, {
+        resource_type: 'image',
+    });;
+
     const post = new Post(req.body.post);
     post.author = req.user._id;
+    post.image = {url:result.url}; 
+
     await post.save();
-    req.flash('success', 'Sucessfully made a new post!');
+    console.log(post);
+    req.flash('success', 'Successfully made a new post!');
     res.redirect(`/post/${post._id}`);
 }));
 

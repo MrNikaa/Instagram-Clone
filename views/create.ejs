@@ -1,9 +1,8 @@
 <% layout('layouts/boilerplate')%>
 <div class="main-content">
-    <form action="/" method="POST"> 
+    <form action="/" method="POST" enctype="multipart/form-data"> 
         <h2>Create a New Post</h2>
-        <label for="image">Image:</label>
-        <input type="text" id="image" name="post[image]" required>
+        <input type="file" name="image">
 
         <label for="description">Description:</label>
         <textarea id="description" name="post[description]" rows="4" cols="50" required></textarea>

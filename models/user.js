@@ -9,7 +9,9 @@ const userSchema = new Schema({
         required: true,
         unique: true
     },
-    profilePicture: String,
+    profilePicture: {
+        url: String
+      },
     followers: [{
         type: Schema.Types.ObjectId,
         ref: 'User'

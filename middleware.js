@@ -23,7 +23,7 @@ module.exports.isAuthor = async (req, res, next) => {
 module.exports.validatePost = (req, res, next) => {
   const result = postSchema.validate(req.body)
   if (result.error) {
-    const msg = error.details.map(el => el.message).join(',');
+    const msg = result.error.details.map(el => el.message).join(',');
     throw new ExpressError(msg, 400);
   } else {
     next();

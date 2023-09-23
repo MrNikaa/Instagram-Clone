@@ -3,7 +3,7 @@
     <div class="main-content">
         <div class="profile-container">
             <div class="all-info-container">
-                <img src="/imgs/pfp.png" alt="Profile picture" class="pfp">
+                <img src="<%=user.profilePicture.url%>" alt="Profile picture" class="pfp">
                 <div class="info-container">
                     <div class="top">
                         <h1 class="username-text">
@@ -33,9 +33,16 @@
                         </p>
                         <p class="info-text">332 following</p>
                     </div>
+
                 </div>
             </div>
-
+            <div class="posts-container">
+                <% for(let userPost of userPosts){%>
+                    <div class="post">
+                        <img src="<%=userPost.image.url%>" alt="post image" data-post-id="<%=userPost._id%>">
+                    </div>
+                    <% } %>
+            </div>
         </div>
 
         <div class="followers-container">
@@ -43,7 +50,7 @@
                 <% if (currentUser && currentUser._id.equals(follower._id)) continue; %>
                     <div class="user-container">
                         <div class="follower-info-container">
-                            <img src="/imgs/pfp.png" alt="">
+                            <img src="<%=follower.profilePicture.url%>" alt="">
                             <a href="/<%=follower._id%>/profile">
                                 <%=follower.username%>
                             </a>
@@ -53,6 +60,7 @@
                                     <%= currentUser && follower.followers.includes(currentUser._id) ? 'Unfollow'
                                         : 'Follow' %>
                                 </button>
+
                             </form>
                         </div>
                     </div>
@@ -75,11 +83,12 @@
 
         .profile-container {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
             width: 75%;
             height: 80vh;
             margin: 0 auto;
-            border: 1px solid red;
         }
 
         .info-container {
@@ -87,8 +96,7 @@
             flex-direction: column;
             width: 60%;
             height: 80%;
-            margin-left: 10%;
-            border: 1px solid red;
+            margin-left: 10%;;
         }
 
         .all-info-container {
@@ -96,7 +104,28 @@
             align-items: center;
             width: 65%;
             height: 30%;
-            border: 1px solid red;
+            border-bottom: 1px solid #4a4a4a;
+        }
+
+        .posts-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: fltat;
+            flex-wrap: wrap;
+            margin-top: 25px;
+            width: 65%;
+            height: 100%;
+        }
+
+        .post {
+            width: 225px;
+            height: 225px;
+            margin: 10px;
+        }
+
+        .post img {
+            width: 225px;
+            height: 225px;
         }
 
         .top {
@@ -110,7 +139,6 @@
             flex-direction: row;
             align-items: center;
             justify-content: flex-start;
-            border: 1px solid red;
             margin: 10px;
         }
 
@@ -163,7 +191,7 @@
             margin-left: 15px;
         }
 
-        .follow-button-follower{
+        .follow-button-follower {
             margin-left: 200px;
             padding: 8px 16px;
             background-color: #279EFF;
@@ -174,7 +202,7 @@
             box-sizing: border-box;
         }
 
-        .follower-info-container .following{
+        .follower-info-container .following {
             background-color: #4a4a4a;
         }
 
@@ -234,16 +262,13 @@
             width: 150px;
             border-radius: 50%;
             margin-left: 5%;
-            border: 1px solid red;
         }
     </style>
 
     <script>
         const followButton = document.querySelector('.follow-button');
-        const followButtonFollower = document.querySelector('.follow-button-follower');
         const followersText = document.getElementById('followers-text');
         const followersContainer = document.querySelector('.followers-container');
-        const isCurrentlyFollowing = followButtonFollower.getAttribute('data-following') === 'true';
 
 
         if (followButton) {
@@ -264,28 +289,27 @@
             });
         }
 
-        if (followButtonFollower) {
-            followButtonFollower.addEventListener('click', () => {
-                const isFollowing = followButtonFollower.getAttribute('data-following') === 'true';
+        function setupFollowButtonEventListeners() {
+            const followButtons = document.querySelectorAll('.follow-button-follower');
 
-                if (isFollowing) {
-                    followButtonFollower.innerText = 'Follow';
-                    followButtonFollower.classList.remove('following');
-                    followButtonFollower.setAttribute('data-following', 'false');
-                } else {
-                    followButtonFollower.innerText = 'Unfollow';
-                    followButtonFollower.classList.add('following');
-                    followButtonFollower.setAttribute('data-following', 'true');
-                }
+            followButtons.forEach((button) => {
+                button.addEventListener('click', () => {
+                    const isFollowing = button.getAttribute('data-following') === 'true';
+
+                    if (isFollowing) {
+                        button.innerText = 'Follow';
+                        button.classList.remove('following');
+                        button.setAttribute('data-following', 'false');
+                    } else {
+                        button.innerText = 'Unfollow';
+                        button.classList.add('following');
+                        button.setAttribute('data-following', 'true');
+                    }
+                });
             });
         }
 
-        if(isCurrentlyFollowing){
-            followButtonFollower.classList.add('following');
-        }   
-        else{
-            followButtonFollower.classList.remove('following');
-        }
+        setupFollowButtonEventListeners();
 
         followersText.addEventListener('click', () => {
 
@@ -303,6 +327,20 @@
                 !followersContainer.contains(event.target) &&
                 !followersText.contains(event.target);
         }
+
+        function handlePostClicked() {
+            const postImages = document.querySelectorAll('.post img');
+
+            postImages.forEach(image => {
+                image.addEventListener('click', () => {
+                    const postId = image.getAttribute('data-post-id');
+                    if (postId) {
+                        window.location.href = `/post/${postId}`;
+                    }
+                });
+            });
+        }
+        handlePostClicked();
 
         document.addEventListener('click', (event) => {
             if (isClickOutside(event)) {

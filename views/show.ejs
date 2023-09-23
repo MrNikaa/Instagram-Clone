@@ -3,7 +3,7 @@
         <div class="post-container">
             <div class="top-container">
                 <div class="author-container">
-                    <img src="/imgs/pfp.png" class="profile-picture" alt="">
+                    <img src="<%=post.author.profilePicture.url%>" class="profile-picture" alt="">
                     <a href="/<%=post.author._id%>/profile">
                         <p class="username-text">
                             <%= post.author.username %>
@@ -15,7 +15,7 @@
                 </button>
             </div>
 
-            <img class="post-img" src="<%= post.image %>" alt="">
+            <img class="post-img" src="<%= post.image.url %>" alt="">
             <div class="icon-container">
                 <form action="/<%=post._id%>/like" method="POST">
                     <button type="submit" class="like-button">
@@ -47,7 +47,7 @@
                 <% if (liker && currentUser && !currentUser._id.equals(liker._id)) { %>
                     <div class="user-container">
                         <div class="liker-info-container">
-                            <img src="/imgs/pfp.png" alt="">
+                            <img src="<%=liker.profilePicture.url%>" alt="">
                             <a href="/<%=liker._id%>/profile">
                                 <%=liker.username%>
                             </a>
@@ -61,7 +61,7 @@
                         </div>
                     </div>
                     <% } %>
-                        <% } %>
+                <% } %>
         </div>
 
     </div>
