@@ -4,7 +4,7 @@ const Post = require('../models/post');
 const passport = require('passport');
 const catchAsync = require('../utils/catchAsync');
 const multer = require('multer');
-const {storage, cloudinary} = require('../cloudinary');
+const { storage, cloudinary } = require('../cloudinary');
 const upload = multer(storage);
 const { isLoggedIn } = require('../middleware');
 const router = express.Router();
@@ -20,7 +20,7 @@ router.get('/:id/profile', catchAsync(async (req, res) => {
         const followUser = await User.findById(follower._id);
         followingUsers.push(followUser);
     }
-    res.render('user/profile', { user, postCount, followingUsers, userPosts});
+    res.render('user/profile', { user, postCount, followingUsers, userPosts });
 }));
 
 router.post('/:id/profile/follow', isLoggedIn, catchAsync(async (req, res) => {
@@ -38,6 +38,22 @@ router.post('/:id/profile/follow', isLoggedIn, catchAsync(async (req, res) => {
     res.status(204).send();
 }));
 
+router.get('/:id/profile/edit', catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    res.render('user/editProfile', { user });
+}));
+
+router.put('/:id/profile/edit', upload.single('image'), catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const { username } = req.body;
+    const user = await User.findById(id);
+    user.username = `${username}`;
+    await user.save();
+    res.redirect(`/${user._id}/profile`);
+
+}));
+
 router.get('/register', (req, res) => {
     res.render('authentication/register');
 });
@@ -49,7 +65,7 @@ router.post('/register', upload.single('image'), catchAsync(async (req, res, nex
         });;
         const { email, username, password } = req.body;
         const user = new User({ email, username });
-        user.profilePicture = {url:result.url}; 
+        user.profilePicture = { url: result.url };
         const registeredUser = await User.register(user, password);
         req.login(registeredUser, err => {
             if (err) return next(err);

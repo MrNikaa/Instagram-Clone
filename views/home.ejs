@@ -33,6 +33,27 @@
                 <p class="post-info-text">
                     <%= post.description %>
                 </p>
+
+                <form action="/<%=post._id%>/comment" method="POST" class="comment-form">
+                    <input type="text" name="comment" placeholder="Add a comment..." class="comment-input">
+                </form>
+
+                <% const lastThreeComments=post.comments.slice(-3).reverse(); %>
+
+                    <% for (let comment of lastThreeComments) { %>
+                        <div class="comment-container">
+                            <a href="/<%=comment.author._id%>/profile" class="commenter-username-text">
+                                <%=comment.author.username%>
+                            </a>
+                            <div class="comment">
+                                <img class="profile-picture" src="<%=comment.author.profilePicture.url%>" alt="">
+                                <p class="post-text">
+                                    <%=comment.text%> %>
+                                </p>
+                            </div>
+                        </div>
+                        <% } %>
+                            <a href="/post/<%=post._id%>" class="commenter-username-text">All Comments</a>
             </div>
             <% } %>
                 <% for (let post of reversedPosts) { %>
@@ -59,7 +80,7 @@
                         <% for (let post of reversedPosts) { %>
                             <div id="likes-container-<%= post._id %>" class="likes-container" style="display: none;">
                                 <% for (let liker of post.likes) { %>
-                                    <% if (liker && !currentUser._id.equals(liker._id)) { %>
+                                    <% if (currentUser && liker && !currentUser._id.equals(liker._id)) { %>
                                         <div class="user-container">
                                             <!-- Liked user information -->
                                             <div class="liker-info-container">
@@ -90,6 +111,9 @@
             align-items: center;
             justify-content: space-between;
             width: 100%;
+            border-top: 2px solid #1F1E1E;
+            padding-top: 25px;
+            border-radius: 10px;
         }
 
         .author-container {
@@ -128,6 +152,19 @@
             padding: 10px 0px 10px 0px;
         }
 
+        .comment-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            padding: 20px;
+            margin-bottom: 5px;
+        }
+
+        .comment {
+            display: flex;
+            align-items: center;
+        }
+
         .icon-img {
             width: 26px;
             height: 26px;
@@ -143,6 +180,11 @@
             overflow: auto;
             padding: 40px;
             color: white;
+        }
+
+        .comment-container:last-of-type {
+            border-bottom: 2px solid #1F1E1E;
+            border-radius: 10px;
         }
 
         .more-button {
@@ -256,10 +298,6 @@
             box-sizing: border-box;
         }
 
-        .liker-info-container .following {
-            background-color: #4a4a4a;
-        }
-
         .likes-container::-webkit-scrollbar {
             width: 17px;
             /* Width of the scrollbar */
@@ -286,6 +324,15 @@
 
         .username-text {
             font-family: sans-serif;
+            padding-bottom: 15px;
+            color: white;
+        }
+
+        .commenter-username-text {
+            font-family: sans-serif;
+            font-size: 15px;
+            font-weight: bold;
+            padding-bottom: 15px;
             color: white;
         }
 
@@ -293,7 +340,33 @@
             font-size: 14px;
             padding-bottom: 15px;
             width: 100%;
-            border-bottom: 2px solid #1F1E1E;
+        }
+
+        .comment-form {
+            background-color: black;
+            /* Dark background color */
+            border-radius: 10px;
+            margin: 20px auto;
+            width: 100%;
+            height: 100px;
+        }
+
+        .comment-input {
+            background-color: black;
+            /* Dark textarea background color */
+            color: white;
+            border: 1px solid #444;
+            border-radius: 5px;
+            width: 100%;
+            height: 50px;
+            padding: 10px;
+
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border: 1px solid #66afe9;
+            /* Focus color */
         }
     </style>
 
@@ -438,16 +511,12 @@
                 const postID = followButton.dataset.userId;
                 const storageKey = `follow-${userID}-${postID}`;
                 const isFollowing = localStorage.getItem(storageKey) === 'true';
-                if (isFollowing) {
-                    followButton.classList.add('following');
-                }
+
                 followButton.addEventListener("click", function () {
                     if (followButton.innerText === "Follow") {
-                        followButton.classList.add('following');
                         followButton.innerText = "Unfollow";
                         localStorage.setItem(storageKey, 'true');  // Save follow state
                     } else {
-                        followButton.classList.remove('following');
                         followButton.innerText = "Follow";
                         localStorage.removeItem(storageKey);  // Remove follow state
                     }
@@ -462,15 +531,14 @@
                 });
             }
 
-        });
-
-        window.addEventListener("pageshow", (event) => {
-            const historyTraversal = event.persisted ||
-                (typeof window.performance != "undefined" &&
-                    window.performance.navigation.type === 2);
-            if (historyTraversal) {
-                // Handle page restore.
-                window.location.reload();
-            }
+            window.addEventListener("pageshow", (event) => {
+                const historyTraversal = event.persisted ||
+                    (typeof window.performance != "undefined" &&
+                        window.performance.navigation.type === 2);
+                if (historyTraversal) {
+                    // Handle page restore.
+                    window.location.reload();
+                }
+            });
         });
     </script>

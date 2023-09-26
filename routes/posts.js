@@ -3,19 +3,19 @@ const catchAsync = require('../utils/catchAsync');
 const Post = require('../models/post');
 const router = express.Router();
 const multer = require('multer');
-const {storage, cloudinary} = require('../cloudinary');
+const { storage, cloudinary } = require('../cloudinary');
 const upload = multer(storage);
 const { isLoggedIn, isAuthor, validatePost } = require('../middleware');
 
 
 router.get('/', async (req, res) => {
-    const posts = await Post.find({}).populate('author').populate('likes');
+    const posts = await Post.find({}).populate('author').populate('likes').populate({path: 'comments', populate: {path: 'author', model: 'User' }});
     const reversedPosts = posts.slice().reverse();
     res.render('home', { reversedPosts });
 });
 
 router.get('/post/:id', catchAsync(async (req, res) => {
-    const post = await Post.findById(req.params.id).populate('author').populate('likes');
+    const post = await Post.findById(req.params.id).populate('author').populate('likes').populate({path: 'comments', populate: {path: 'author', model: 'User' }});;
     if (!post) {
         req.flash('error', 'Can not find the campground!');
         return res.redirect('/');
@@ -50,7 +50,7 @@ router.post('/', isLoggedIn, upload.single('image'), validatePost, catchAsync(as
 
     const post = new Post(req.body.post);
     post.author = req.user._id;
-    post.image = {url:result.url}; 
+    post.image = { url: result.url };
 
     await post.save();
     console.log(post);
@@ -61,19 +61,35 @@ router.post('/', isLoggedIn, upload.single('image'), validatePost, catchAsync(as
 router.post('/:id/like', isLoggedIn, catchAsync(async (req, res) => {
     const { id } = req.params;
     const post = await Post.findById(id).populate('likes');
-  
+
     const alreadyLiked = post.likes.some(userId => userId.equals(req.user._id));
-    
+
     if (alreadyLiked) {
-      post.likes.pull(req.user._id);
+        post.likes.pull(req.user._id);
     } else {
-      post.likes.push(req.user._id);
+        post.likes.push(req.user._id);
     }
-  
+
     await post.save();
     res.status(204).send();
-  }));
-  
+}));
+
+router.post('/:id/comment', catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const { comment } = req.body;  // Assuming req.body.commentText contains the comment text
+    const currentUser = res.locals.currentUser;
+
+    const post = await Post.findById(id);
+    const newComment = {
+        author: currentUser._id,  // Assuming currentUser has the author's ObjectId
+        text: comment  // Assuming comment text is provided in the request body
+    };
+    post.comments.push(newComment);
+
+    await post.save();
+    console.log(post.comments[0]._id);
+    res.redirect(`/post/${post._id}`);
+}));
 
 router.delete('/:id', isLoggedIn, isAuthor, catchAsync(async (req, res) => {
     const { id } = req.params;

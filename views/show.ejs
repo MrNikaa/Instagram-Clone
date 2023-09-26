@@ -31,38 +31,57 @@
             <p class="post-info-text">
                 <%= post.description %>
             </p>
-        </div>
-        <div id="more-container">
-            <% if(currentUser && post.author.equals(currentUser._id)){ %>
-                <form class="d-inline" action="/<%=post._id%>?_method=DELETE" method="POST">
-                    <button class="more-buttons" id="delete-button">Delete</button>
-                </form>
-                <button class="more-buttons" id="edit-button">Edit</button>
-                <button class="more-buttons" id="copy-button">Copy Link</button>
-                <%}%>
-        </div>
 
-        <div class="likes-container">
-            <% for (let liker of post.likes) { %>
-                <% if (liker && currentUser && !currentUser._id.equals(liker._id)) { %>
-                    <div class="user-container">
-                        <div class="liker-info-container">
-                            <img src="<%=liker.profilePicture.url%>" alt="">
-                            <a href="/<%=liker._id%>/profile">
-                                <%=liker.username%>
-                            </a>
-                            <form action="/<%= liker._id %>/profile/follow" method="POST">
-                                <button type="submit" class="follow-button-follower" data-user-id="<%= liker._id %>"
-                                    data-following="<%= currentUser && liker.followers.includes(currentUser._id) %>">
-                                    <%= currentUser && liker.followers.includes(currentUser._id) ? 'Unfollow' : 'Follow'
-                                        %>
-                                </button>
-                            </form>
-                        </div>
+            <form action="/<%=post._id%>/comment" method="POST" class="comment-form">
+                <input type="text" name="comment" placeholder="Add a comment..." class="comment-input">
+            </form>
+
+            <% for (let comment of post.comments) { %>
+                <div class="comment-container">
+                    <a href="/<%=comment.author._id%>/profile" class="commenter-username-text">
+                        <%=comment.author.username%>
+                    </a>
+                    <div class="comment">
+                        <img class="profile-picture" src="<%=comment.author.profilePicture.url%>" alt="">
+                        <p class="post-text">
+                            <%=comment.text%> %>
+                        </p>
                     </div>
-                    <% } %>
+                </div>
                 <% } %>
         </div>
+                <div id="more-container">
+                    <% if(currentUser && post.author.equals(currentUser._id)){ %>
+                        <form class="d-inline" action="/<%=post._id%>?_method=DELETE" method="POST">
+                            <button class="more-buttons" id="delete-button">Delete</button>
+                        </form>
+                        <button class="more-buttons" id="edit-button">Edit</button>
+                        <button class="more-buttons" id="copy-button">Copy Link</button>
+                        <%}%>
+                </div>
+
+                <div class="likes-container">
+                    <% for (let liker of post.likes) { %>
+                        <% if (liker && currentUser && !currentUser._id.equals(liker._id)) { %>
+                            <div class="user-container">
+                                <div class="liker-info-container">
+                                    <img src="<%=liker.profilePicture.url%>" alt="">
+                                    <a href="/<%=liker._id%>/profile">
+                                        <%=liker.username%>
+                                    </a>
+                                    <form action="/<%= liker._id %>/profile/follow" method="POST">
+                                        <button type="submit" class="follow-button-follower"
+                                            data-user-id="<%= liker._id %>"
+                                            data-following="<%= currentUser && liker.followers.includes(currentUser._id) %>">
+                                            <%= currentUser && liker.followers.includes(currentUser._id) ? 'Unfollow'
+                                                : 'Follow' %>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <% } %>
+                                <% } %>
+                </div>
 
     </div>
 
@@ -108,6 +127,58 @@
             justify-content: flex-start;
             width: 100%;
             padding: 10px 0px 10px 0px;
+        }
+
+        .comment-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .comment{
+            display: flex;
+            align-items: center;
+        }
+
+        .commenter-username-text {
+            font-family: sans-serif;
+            font-size: 15px;
+            font-weight: bold;
+            padding-bottom: 15px;
+            color: white;
+        }
+
+        .comment-form {
+            background-color: black;
+            /* Dark background color */
+            border-radius: 10px;
+            margin: 20px auto;
+            width: 100%;
+            height: 100px;
+        }
+
+        .comment-input {
+            background-color: black;
+            /* Dark textarea background color */
+            color: white;
+            border: 1px solid #444;
+            border-radius: 5px;
+            width: 100%;
+            height: 50px;
+            padding: 10px;
+
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border: 1px solid #66afe9;
+            /* Focus color */
+        }
+
+        .comment-container:last-of-type {
+            border-bottom: 2px solid #1F1E1E;
+            border-radius: 10px;
         }
 
         .icon-img {
@@ -278,7 +349,6 @@
             font-size: 14px;
             padding-bottom: 15px;
             width: 100%;
-            border-bottom: 2px solid #1F1E1E;
         }
     </style>
 

@@ -1,9 +1,7 @@
 <% layout('layouts/boilerplate')%>
 <div class="main-content">
-    <form action="/post/<%=post._id%>?_method=PUT" method="POST"> 
+    <form action="/post/<%=post._id%>?_method=PUT" method="POST" > 
         <h2>Edit the Post</h2>
-        <label for="image">Image:</label>
-        <input type="text" id="image" name="post[image]" value="<%=post.image%>" required>
 
         <label for="description">Description:</label>
         <textarea id="description" name="post[description]" rows="4" cols="50" value="<%=post.description%>" required></textarea>

@@ -1,0 +1,22 @@
+<% layout('layouts/boilerplate')%>
+<div class="main-content">
+    <form action="/<%=user._id%>/profile/edit?_method=PUT" method="POST">
+        <label for="username">New username</label> 
+        <input type="text" name="username" value="<%=user.username%>" required>
+
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+<style>
+    .main-content {
+        position: fixed;
+        right: 0;
+        width: 85%;
+        height: 100%;
+        background-color: black;
+        overflow: auto;
+        padding: 40px;
+        color: white; /* Added text color for the form */
+    }
+</style>
